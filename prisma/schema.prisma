@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                            String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstName                     String
+  lastName                      String
+  userName                      String?
+  email                         String        @unique
+  country                       String
+  state                         String?
+  address                       String?
+  avatarUrl                     String?
+  password                      String
+  emailVerificationToken        String?
+  emailVerificationTokenExpires DateTime?
+  forgotPasswordOTP             String?
+  forgotPasswordOTPExpires      DateTime?
+  dob                           DateTime
+  isEmailVerified               Boolean       @default(false)
+  sponsorStatus                 SponsorStatus @default(NONE)
+  role                          UserRoleEnum  @default(USER)
+  status                        UserStatus    @default(ACTIVE)
+  createdAt                     DateTime      @default(now())
+  updatedAt                     DateTime      @updatedAt
+  Sponsor                       Sponsor?
+  Resources                     Resource[]
+  Comment                       Comment[]
+
+  @@map("users")
+}
+
+model Sponsor {
+  id   String @id @map("_id") @db.ObjectId
+  User User   @relation(fields: [id], references: [id])
+
+  @@map("sponsors")
+}
+
+model Resource {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  authorId  String    @db.ObjectId
+  Author    User      @relation(fields: [authorId], references: [id])
+  fileUrl   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Comments  Comment[]
+
+  @@map("resources")
+}
+
+model Comment {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  resourceId String   @db.ObjectId
+  Resource   Resource @relation(fields: [resourceId], references: [id])
+  authorId   String   @db.ObjectId
+  Author     User     @relation(fields: [authorId], references: [id])
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@map("comments")
+}
+
+model Event {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+enum UserRoleEnum {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum SponsorStatus {
+  PENDING
+  APPROVED
+  NONE
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  INACTIVATE
+  BLOCKED
+}
