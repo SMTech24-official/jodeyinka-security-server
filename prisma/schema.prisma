@@ -35,6 +35,7 @@ model User {
   Sponsor                       Sponsor?
   Resources                     Resource[]
   Comment                       Comment[]
+  Event                         Event[]
 
   @@map("users")
 }
@@ -71,7 +72,18 @@ model Comment {
 }
 
 model Event {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  hostId      String   @db.ObjectId
+  host        User     @relation(fields: [hostId], references: [id])
+  type        String?
+  title       String
+  imageUrl    String?
+  description String
+  date        DateTime
+  venue       String
+  createdAt   DateTime @default(now())
+
+  @@map("events")
 }
 
 enum UserRoleEnum {
