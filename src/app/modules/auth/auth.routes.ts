@@ -14,4 +14,4 @@ router.post('/forgot-password', AuthControllers.forgotPassword);
 router.post('/enter-otp', AuthControllers.enterOTP);
 router.post('/reset-password', AuthControllers.resetPassword);
 
-export const AuthRouters = router;
+export const AuthRouter = router;

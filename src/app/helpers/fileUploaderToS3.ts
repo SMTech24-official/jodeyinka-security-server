@@ -19,7 +19,7 @@ const s3Client = new S3Client({
 
 const uploadToS3 = async (
   fileBuffer: Buffer,
-  folder: string,
+  // folder: string,
   originalName: string,
   mimeType: string,
 ) => {
@@ -32,12 +32,14 @@ const uploadToS3 = async (
   }
   const uniquePrefix = `${uuidv4()}-${Date.now()}`;
   const fileExtension = path.extname(originalName);
-  const fileName = `${folder}/${uniquePrefix}${fileExtension}`;
+  const fileName = `${uniquePrefix}${fileExtension}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: fileName,
+    Body: fileBuffer,
     ContentType: mimeType,
+    ACL: 'public-read',
   });
   try {
     await s3Client.send(command);
@@ -51,4 +53,4 @@ const s3Multer = multer({
   fileFilter: fileFilter,
   storage: multer.memoryStorage(),
 });
-export { s3Client };
+export { uploadToS3, s3Multer };

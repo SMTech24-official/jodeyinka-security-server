@@ -38,4 +38,4 @@ router.post(
   UserControllers.changePassword,
 );
 
-export const UserRouters = router;
+export const UserRouter = router;
