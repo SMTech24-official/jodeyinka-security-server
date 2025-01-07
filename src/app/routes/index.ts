@@ -4,6 +4,7 @@ import { UserRouter } from '../modules/User/user.routes';
 import { eventRouter } from '../modules/event/event.route';
 import path from 'path';
 import { paypalRouter } from '../modules/paypal/paypal.route';
+import { contactRouter } from '../modules/contact/contact.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -22,6 +23,10 @@ const moduleRoutes = [
   {
     path: '/paypal',
     route: paypalRouter,
+  },
+  {
+    path: '/contact',
+    route: contactRouter,
   },
 ];
 

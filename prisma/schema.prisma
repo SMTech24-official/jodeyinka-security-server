@@ -73,16 +73,18 @@ model Comment {
 }
 
 model Event {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  hostId      String   @db.ObjectId
-  host        User     @relation(fields: [hostId], references: [id])
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  hostId      String    @db.ObjectId
+  host        User      @relation(fields: [hostId], references: [id])
   type        String?
   title       String
   imageUrl    String?
   description String
   date        DateTime
+  startTime   DateTime?
+  endTime     DateTime?
   venue       String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@map("events")
 }
