@@ -26,4 +26,9 @@ export default {
     PAYPAL_SECRET: process.env.PAYPAL_SECRET,
     PAYPAL_BASE_URL: process.env.PAYPAL_BASE_URL,
   },
+  squareup: {
+    SQUAREUP_CLIENT: process.env.SQUAREUP_CLIENT,
+    SQUAREUP_ACCESS_TOKEN: process.env.SQUAREUP_ACCESS_TOKEN,
+    SQUAREUP_BASE_URL: process.env.SQUAREUP_BASE_URL,
+  },
 };

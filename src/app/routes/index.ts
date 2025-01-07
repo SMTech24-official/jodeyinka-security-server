@@ -5,6 +5,7 @@ import { eventRouter } from '../modules/event/event.route';
 import path from 'path';
 import { paypalRouter } from '../modules/paypal/paypal.route';
 import { contactRouter } from '../modules/contact/contact.route';
+import { squareRouter } from '../modules/square/square.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -27,6 +28,10 @@ const moduleRoutes = [
   {
     path: '/contact',
     route: contactRouter,
+  },
+  {
+    path: '/square',
+    route: squareRouter,
   },
 ];
 
