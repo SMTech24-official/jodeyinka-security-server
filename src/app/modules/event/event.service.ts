@@ -1,8 +1,6 @@
 import prisma from '../../utils/prisma';
 
 const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
-  console.log(fileUrl);
-
   const event = await prisma.event.create({
     data: {
       ...payLoad,
@@ -10,7 +8,7 @@ const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
       imageUrl: fileUrl,
     },
   });
-  return;
+  return event;
 };
 
 export const eventServices = {

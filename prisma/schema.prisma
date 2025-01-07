@@ -26,6 +26,7 @@ model User {
   forgotPasswordOTP             String?
   forgotPasswordOTPExpires      DateTime?
   dob                           DateTime
+  isMember                      Boolean       @default(false)
   isEmailVerified               Boolean       @default(false)
   sponsorStatus                 SponsorStatus @default(NONE)
   role                          UserRoleEnum  @default(USER)
