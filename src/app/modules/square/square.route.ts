@@ -1,8 +1,9 @@
 import express from 'express';
 import { squareControllers } from './square.controller';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
-router.route('/').post(squareControllers.createPaymentSession);
-
+router.route('/pay').post(squareControllers.createOneTimePaymentSession);
+router.route('/subscribe');
 export const squareRouter = router;

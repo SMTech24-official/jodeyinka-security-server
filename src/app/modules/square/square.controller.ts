@@ -4,16 +4,25 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { squareServices } from './square.service';
 
-const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
-  const result = await squareServices.createPaymentSession();
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Square payment session created successfully.',
-    data: result,
-  });
-});
+const createOneTimePaymentSession = catchAsync(
+  async (req: Request, res: Response) => {
+    const { sourceId, amount, purpose, userId } = req.body;
+    // const userId = req.user.id;
+    const result = await squareServices.createOneTimePaymentSession(
+      amount,
+      sourceId,
+      purpose,
+      userId,
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Square payment session created successfully.',
+      data: result,
+    });
+  },
+);
 
 export const squareControllers = {
-  createPaymentSession,
+  createOneTimePaymentSession,
 };
