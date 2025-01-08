@@ -6,7 +6,8 @@ import httpStatus from 'http-status';
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
-  const result = await paypalService.createPaymentSession(userId);
+  const { purpose } = req.body;
+  const result = await paypalService.createPaymentSession(userId, purpose);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -18,8 +19,8 @@ const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
 const completeOrder = catchAsync(async (req: Request, res: Response) => {
   const userId = req.query.userId as string;
   const orderId = req.query.token as string;
-
-  const result = await paypalService.completeOrder(userId, orderId);
+  const purpose = req.query.purpose as string;
+  const result = await paypalService.completeOrder(userId, orderId, purpose);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

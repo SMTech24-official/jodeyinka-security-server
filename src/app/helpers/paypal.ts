@@ -17,7 +17,20 @@ export const generateAccessToken = async () => {
   return response.data.access_token;
 };
 
-export const createOrder = async (userId: string) => {
+export const getPaypalOrder = async (orderId: string) => {
+  const access_token = await generateAccessToken();
+  const response = await axios({
+    url: `${config.paypal.PAYPAL_BASE_URL}/v2/checkout/orders/${orderId}`,
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return response;
+};
+
+export const createOrder = async (userId: string, purpose: string) => {
   const access_token = await generateAccessToken();
   const response = await axios({
     url: `${config.paypal.PAYPAL_BASE_URL}/v2/checkout/orders`,
@@ -37,7 +50,7 @@ export const createOrder = async (userId: string) => {
         },
       ],
       application_context: {
-        return_url: `${config.BASE_URL}/paypal/complete-order?userId=${userId}`,
+        return_url: `${config.BASE_URL}/paypal/complete-order?userId=${userId}&purpose=${purpose}`,
         cancel_url: `http://facebook.com`,
       },
     },

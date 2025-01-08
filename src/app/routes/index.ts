@@ -6,6 +6,8 @@ import path from 'path';
 import { paypalRouter } from '../modules/paypal/paypal.route';
 import { contactRouter } from '../modules/contact/contact.route';
 import { squareRouter } from '../modules/square/square.route';
+import { resourceRouter } from '../modules/resource/resource.route';
+import { transactionRouter } from '../modules/transaction/transaction.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -32,6 +34,14 @@ const moduleRoutes = [
   {
     path: '/square',
     route: squareRouter,
+  },
+  {
+    path: '/resource',
+    route: resourceRouter,
+  },
+  {
+    path: '/transaction',
+    route: transactionRouter,
   },
 ];
 
