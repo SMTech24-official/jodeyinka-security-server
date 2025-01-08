@@ -6,8 +6,8 @@ import { squareServices } from './square.service';
 
 const createOneTimePaymentSession = catchAsync(
   async (req: Request, res: Response) => {
-    const { sourceId, amount, purpose, userId } = req.body;
-    // const userId = req.user.id;
+    const { sourceId, amount, purpose } = req.body;
+    const userId = req.user.id;
     const result = await squareServices.createOneTimePaymentSession(
       amount,
       sourceId,
@@ -23,6 +23,11 @@ const createOneTimePaymentSession = catchAsync(
   },
 );
 
+const createSubscriptionSession = catchAsync(
+  async (req: Request, res: Response) => {},
+);
+
 export const squareControllers = {
   createOneTimePaymentSession,
+  createSubscriptionSession,
 };

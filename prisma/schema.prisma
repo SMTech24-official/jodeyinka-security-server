@@ -11,11 +11,11 @@ datasource db {
 }
 
 model User {
-  id                            String        @id @default(auto()) @map("_id") @db.ObjectId
+  id                            String          @id @default(auto()) @map("_id") @db.ObjectId
   firstName                     String
   lastName                      String
   userName                      String?
-  email                         String        @unique
+  email                         String          @unique
   country                       String
   state                         String?
   address                       String?
@@ -26,17 +26,18 @@ model User {
   forgotPasswordOTP             String?
   forgotPasswordOTPExpires      DateTime?
   dob                           DateTime
-  isMember                      Boolean       @default(false)
-  isEmailVerified               Boolean       @default(false)
-  sponsorStatus                 SponsorStatus @default(NONE)
-  role                          UserRoleEnum  @default(USER)
-  status                        UserStatus    @default(ACTIVE)
-  createdAt                     DateTime      @default(now())
-  updatedAt                     DateTime      @updatedAt
+  isMember                      Boolean         @default(false)
+  isEmailVerified               Boolean         @default(false)
+  sponsorStatus                 SponsorStatus   @default(NONE)
+  role                          UserRoleEnum    @default(USER)
+  status                        UserStatus      @default(ACTIVE)
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
   Sponsor                       Sponsor?
   Resources                     Resource[]
   Comment                       Comment[]
   Event                         Event[]
+  Notifications                 Notifications[]
 
   @@map("users")
 }
@@ -87,6 +88,17 @@ model Event {
   createdAt   DateTime  @default(now())
 
   @@map("events")
+}
+
+model Notifications {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId  String   @db.ObjectId
+  receiver    User     @relation(fields: [receiverId], references: [id])
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
 }
 
 enum UserRoleEnum {

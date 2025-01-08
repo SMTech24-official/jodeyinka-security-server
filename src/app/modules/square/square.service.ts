@@ -23,14 +23,23 @@ const createOneTimePaymentSession = async (
   });
 
   if (response.result.payment?.status === 'COMPLETED') {
-    if (purpose === 'EVENT') {
-      // await prisma
+    if (purpose === 'MEMBERSHIP') {
+      await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          isMember: true,
+        },
+      });
     }
   }
-
   return;
 };
 
+const createSubscriptionSession = async () => {};
+
 export const squareServices = {
   createOneTimePaymentSession,
+  createSubscriptionSession,
 };
