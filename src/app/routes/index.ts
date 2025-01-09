@@ -1,6 +1,6 @@
 import express from 'express';
-import { AuthRouter } from '../modules/Auth/auth.routes';
-import { UserRouter } from '../modules/User/user.routes';
+import { AuthRouter } from '../modules/auth/auth.routes';
+import { UserRouter } from '../modules/user/user.routes';
 import { eventRouter } from '../modules/event/event.route';
 import path from 'path';
 import { paypalRouter } from '../modules/paypal/paypal.route';

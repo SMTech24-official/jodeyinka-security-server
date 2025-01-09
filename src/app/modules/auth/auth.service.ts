@@ -5,7 +5,7 @@ import config from '../../../config';
 import AppError from '../../errors/AppError';
 import { generateToken } from '../../utils/generateToken';
 import prisma from '../../utils/prisma';
-import { UserServices } from '../User/user.service';
+import { UserServices } from '../user/user.service';
 import Email from '../../utils/email';
 
 const loginUserFromDB = async (payload: {
