@@ -11,11 +11,11 @@ datasource db {
 }
 
 model User {
-  id                            String        @id @default(auto()) @map("_id") @db.ObjectId
+  id                            String          @id @default(auto()) @map("_id") @db.ObjectId
   firstName                     String
   lastName                      String
   userName                      String?
-  email                         String        @unique
+  email                         String          @unique
   country                       String
   state                         String?
   address                       String?
@@ -26,16 +26,20 @@ model User {
   forgotPasswordOTP             String?
   forgotPasswordOTPExpires      DateTime?
   dob                           DateTime
-  isEmailVerified               Boolean       @default(false)
-  sponsorStatus                 SponsorStatus @default(NONE)
-  role                          UserRoleEnum  @default(USER)
-  status                        UserStatus    @default(ACTIVE)
-  createdAt                     DateTime      @default(now())
-  updatedAt                     DateTime      @updatedAt
+  isMember                      Boolean         @default(false)
+  isEmailVerified               Boolean         @default(false)
+  sponsorStatus                 SponsorStatus   @default(NONE)
+  role                          UserRoleEnum    @default(USER)
+  status                        UserStatus      @default(ACTIVE)
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
   Sponsor                       Sponsor?
   Resources                     Resource[]
   Comment                       Comment[]
   Event                         Event[]
+  Notifications                 Notifications[]
+  Transaction                   Transaction[]
+  EventSponsor                  EventSponsor[]
 
   @@map("users")
 }
@@ -48,13 +52,16 @@ model Sponsor {
 }
 
 model Resource {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  authorId  String    @db.ObjectId
-  Author    User      @relation(fields: [authorId], references: [id])
-  fileUrl   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Comments  Comment[]
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  authorId    String       @db.ObjectId
+  Author      User         @relation(fields: [authorId], references: [id])
+  fileUrl     String?
+  description String
+  type        ResourceType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Comments    Comment[]
 
   @@map("resources")
 }
@@ -71,19 +78,64 @@ model Comment {
   @@map("comments")
 }
 
+model EventSponsor {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  tier      EventSponsorTier
+  fee       Float
+  eventId   String           @db.ObjectId
+  event     Event            @relation(fields: [eventId], references: [id])
+  sponsorId String           @db.ObjectId
+  sponsor   User             @relation(fields: [sponsorId], references: [id])
+
+  @@map("event_sponsors")
+}
+
 model Event {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  hostId      String   @db.ObjectId
-  host        User     @relation(fields: [hostId], references: [id])
-  type        String?
-  title       String
-  imageUrl    String?
-  description String
-  date        DateTime
-  venue       String
-  createdAt   DateTime @default(now())
+  id                       String         @id @default(auto()) @map("_id") @db.ObjectId
+  hostId                   String         @db.ObjectId
+  host                     User           @relation(fields: [hostId], references: [id])
+  type                     String?
+  title                    String
+  imageUrl                 String?
+  description              String
+  date                     DateTime
+  silverSponsorFee         Float
+  goldSponsorFee           Float
+  platinumSponsorFee       Float
+  silverSponsorAvailable   Boolean        @default(true)
+  goldSponsorAvailable     Boolean        @default(true)
+  platinumSponsorAvailable Boolean        @default(true)
+  endTime                  DateTime?
+  venue                    String
+  createdAt                DateTime       @default(now())
+  EventSponsor             EventSponsor[]
 
   @@map("events")
+}
+
+model Notifications {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId  String?  @db.ObjectId
+  receiver    User?    @relation(fields: [receiverId], references: [id])
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model Transaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  paymentId String
+  amount    Float
+  type      String
+  currency  String
+  method    String
+  createdAt DateTime @default(now())
+
+  @@map("transactions")
 }
 
 enum UserRoleEnum {
@@ -98,9 +150,21 @@ enum SponsorStatus {
   NONE
 }
 
+enum EventSponsorTier {
+  SILVER
+  GOLD
+  PLATINUM
+}
+
 enum UserStatus {
   ACTIVE
   PENDING
   INACTIVATE
   BLOCKED
+}
+
+enum ResourceType {
+  MEDIA
+  RESOURCE
+  BLOG
 }

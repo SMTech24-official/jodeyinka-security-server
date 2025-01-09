@@ -5,9 +5,9 @@ export default class Email {
   firstName: string;
   from: string;
   subject: any;
-  constructor(user: User) {
-    this.to = user.email;
-    this.firstName = user.firstName;
+  constructor(user: any) {
+    this.to = user.email || 'admin@gmail.com';
+    this.firstName = user.firstName || 'admin';
     this.from = `Mashrafie Rahim Sheikh <${process.env.EMAIL_FROM}>`;
   }
 
@@ -70,7 +70,7 @@ export default class Email {
   }
 
   async sendWelcome() {
-    await this.send('welcome', 'Welcome to the Natours family!');
+    await this.send('welcome', 'Welcome to XYZ');
   }
 
   async sendPasswordReset(OTP: string) {
@@ -103,5 +103,12 @@ export default class Email {
 </body>
 </html>`;
     await this.send(html, 'Reset your password');
+  }
+
+  async sendContactMail(data: any) {
+    const template = `<h1 style="background-color: #f9f9f9; padding: 10px; text-align: center; font-size: 12px; color: #999999;">
+            <p style="margin: 0;">Hello I want to send you a message.</p>
+        </h1>`;
+    await this.send(template, 'Contact Message');
   }
 }

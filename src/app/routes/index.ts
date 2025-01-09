@@ -1,16 +1,47 @@
 import express from 'express';
-import { AuthRouters } from '../modules/Auth/auth.routes';
-import { UserRouters } from '../modules/User/user.routes';
+import { AuthRouter } from '../modules/Auth/auth.routes';
+import { UserRouter } from '../modules/User/user.routes';
+import { eventRouter } from '../modules/event/event.route';
+import path from 'path';
+import { paypalRouter } from '../modules/paypal/paypal.route';
+import { contactRouter } from '../modules/contact/contact.route';
+import { squareRouter } from '../modules/square/square.route';
+import { resourceRouter } from '../modules/resource/resource.route';
+import { transactionRouter } from '../modules/transaction/transaction.route';
 const router = express.Router();
 
 const moduleRoutes = [
   {
     path: '/auth',
-    route: AuthRouters,
+    route: AuthRouter,
   },
   {
     path: '/users',
-    route: UserRouters,
+    route: UserRouter,
+  },
+  {
+    path: '/events',
+    route: eventRouter,
+  },
+  {
+    path: '/paypal',
+    route: paypalRouter,
+  },
+  {
+    path: '/contact',
+    route: contactRouter,
+  },
+  {
+    path: '/square',
+    route: squareRouter,
+  },
+  {
+    path: '/resource',
+    route: resourceRouter,
+  },
+  {
+    path: '/transaction',
+    route: transactionRouter,
   },
 ];
 

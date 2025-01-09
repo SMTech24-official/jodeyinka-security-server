@@ -14,10 +14,11 @@ export const fileFilter = (req: Request, file: any, cb: any) => {
     'video/mp4',
     'application/pdf',
   ];
+
   if (
-    allowedMimeTypes.includes(file.mimeType) ||
-    file.mimeType.startsWith('image/') ||
-    file.mimeType.startsWith('video/')
+    allowedMimeTypes.includes(file.mimetype) ||
+    file.mimetype.startsWith('image/') ||
+    file.mimetype.startsWith('video/')
   ) {
     cb(null, true);
   } else {
