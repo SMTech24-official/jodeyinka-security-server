@@ -166,5 +166,5 @@ enum UserStatus {
 enum ResourceType {
   MEDIA
   RESOURCE
-  BLOGS
+  BLOG
 }

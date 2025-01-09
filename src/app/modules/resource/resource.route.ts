@@ -5,11 +5,17 @@ import { s3Multer } from '../../helpers/fileUploaderToS3';
 const router = express.Router();
 
 router
-  .route('/')
+  .route('/type/:type')
+  .get(auth(), resourceControllers.getResources)
   .post(
     auth(),
     s3Multer.single('resourceFile'),
     resourceControllers.createResource,
   );
+
+router.route('/:resourceId').get(resourceControllers.getSingleResource);
+router
+  .route('/:resourceId/comment')
+  .post(auth(), resourceControllers.createCommentOnResource);
 
 export const resourceRouter = router;

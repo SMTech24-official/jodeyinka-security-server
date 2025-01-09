@@ -27,6 +27,17 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUpcomingEvents = catchAsync(async (req: Request, res: Response) => {
+  const upcomingEvents = await eventServices.getUpcomingEvents();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Upcoming events retrieved successfully.',
+    data: upcomingEvents,
+  });
+});
+
 export const eventControllers = {
   createEvent,
+  getUpcomingEvents,
 };

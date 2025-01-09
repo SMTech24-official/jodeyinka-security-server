@@ -11,6 +11,17 @@ const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
   return event;
 };
 
+const getUpcomingEvents = async () => {
+  const events = await prisma.event.findMany({
+    where: {
+      date: {
+        gt: new Date(),
+      },
+    },
+  });
+  return events;
+};
 export const eventServices = {
   createEvent,
+  getUpcomingEvents,
 };

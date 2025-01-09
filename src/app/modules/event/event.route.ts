@@ -6,6 +6,8 @@ const router = express.Router();
 
 router
   .route('/')
+  .get(eventControllers.getUpcomingEvents)
   .post(auth(), s3Multer.single('eventImage'), eventControllers.createEvent);
+router.route('/upcoming').get(eventControllers.getUpcomingEvents);
 
 export const eventRouter = router;
