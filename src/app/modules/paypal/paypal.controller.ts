@@ -6,8 +6,12 @@ import httpStatus from 'http-status';
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
-  const { purpose } = req.body;
-  const result = await paypalService.createPaymentSession(userId, purpose);
+  const { purpose, amount } = req.body;
+  const result = await paypalService.createPaymentSession(
+    amount,
+    userId,
+    purpose,
+  );
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

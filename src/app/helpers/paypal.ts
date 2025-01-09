@@ -30,7 +30,11 @@ export const getPaypalOrder = async (orderId: string) => {
   return response;
 };
 
-export const createOrder = async (userId: string, purpose: string) => {
+export const createOrder = async (
+  amount: string,
+  userId: string,
+  purpose: string,
+) => {
   const access_token = await generateAccessToken();
   const response = await axios({
     url: `${config.paypal.PAYPAL_BASE_URL}/v2/checkout/orders`,
@@ -45,7 +49,7 @@ export const createOrder = async (userId: string, purpose: string) => {
         {
           amount: {
             currency_code: 'USD',
-            value: '1.00',
+            value: amount,
           },
         },
       ],

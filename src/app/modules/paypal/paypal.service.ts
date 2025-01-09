@@ -7,7 +7,11 @@ import {
 } from '../../helpers/paypal';
 import prisma from '../../utils/prisma';
 
-const createPaymentSession = async (userId: string, purpose: string) => {
+const createPaymentSession = async (
+  amount: string,
+  userId: string,
+  purpose: string,
+) => {
   const transaction = await prisma.transaction.findFirst({
     where: {
       userId: userId,
@@ -20,7 +24,10 @@ const createPaymentSession = async (userId: string, purpose: string) => {
       'You have already paid for the membership.',
     );
   }
-  const session = await createOrder(userId, purpose);
+  if (purpose === 'MEMBERSHIP' && Number(amount) !== 1) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Membership payment is 1$.');
+  }
+  const session = await createOrder(amount, userId, purpose);
   return session;
 };
 
@@ -32,18 +39,20 @@ const completeOrder = async (
   const payment = await captureOrder(orderId);
   if (payment.status === 'COMPLETED') {
     await prisma.$transaction(async prisma => {
-      const user = await prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          isMember: true,
-        },
-      });
+      if (purpose === 'MEMBERSHIP') {
+        const user = await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            isMember: true,
+          },
+        });
+      }
 
       const newTransaction = await prisma.transaction.create({
         data: {
-          userId: user.id,
+          userId: userId,
           paymentId: orderId,
           amount: Number(
             payment.purchase_units[0].payments.captures[0].amount.value,
