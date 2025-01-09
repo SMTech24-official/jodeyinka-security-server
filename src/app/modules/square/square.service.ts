@@ -14,19 +14,23 @@ const createOneTimePaymentSession = async (
   if (!amount) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Amount not defined.');
   }
-  const transaction = await prisma.transaction.findFirst({
-    where: {
-      userId: userId,
-      type: 'MEMBERSHIP',
-    },
-  });
-  if (transaction) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You have already paid for the membership.',
-    );
+  if (purpose === 'MEMBERSHIP') {
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        userId: userId,
+        type: 'MEMBERSHIP',
+      },
+    });
+    if (transaction) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have already paid for the membership.',
+      );
+    }
   }
-
+  if (purpose === 'MEMBERSHIP' && Number(amount) !== 1) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Membership payment is 1$.');
+  }
   const response = await client.paymentsApi.createPayment({
     sourceId,
     idempotencyKey: new Date().getTime().toString(),
@@ -38,8 +42,8 @@ const createOneTimePaymentSession = async (
   });
 
   if (response.result.payment?.status === 'COMPLETED') {
-    if (purpose === 'MEMBERSHIP') {
-      await prisma.$transaction(async prisma => {
+    await prisma.$transaction(async prisma => {
+      if (purpose === 'MEMBERSHIP') {
         const user = await prisma.user.update({
           where: {
             id: userId,
@@ -48,18 +52,18 @@ const createOneTimePaymentSession = async (
             isMember: true,
           },
         });
-        const newTransaction = await prisma.transaction.create({
-          data: {
-            userId: user.id,
-            paymentId: response.result.payment?.id as string,
-            amount: Number(response.result.payment?.amountMoney?.amount),
-            type: purpose,
-            method: 'SquareUp',
-            currency: response.result.payment?.amountMoney?.currency as string,
-          },
-        });
+      }
+      const newTransaction = await prisma.transaction.create({
+        data: {
+          userId: userId,
+          paymentId: response.result.payment?.id as string,
+          amount: Number(response.result.payment?.amountMoney?.amount),
+          type: purpose,
+          method: 'SquareUp',
+          currency: response.result.payment?.amountMoney?.currency as string,
+        },
       });
-    }
+    });
   }
   return;
 };

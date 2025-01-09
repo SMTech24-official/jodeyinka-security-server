@@ -12,17 +12,19 @@ const createPaymentSession = async (
   userId: string,
   purpose: string,
 ) => {
-  const transaction = await prisma.transaction.findFirst({
-    where: {
-      userId: userId,
-      type: 'MEMBERSHIP',
-    },
-  });
-  if (transaction) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'You have already paid for the membership.',
-    );
+  if (purpose === 'MEMBERSHIP') {
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        userId: userId,
+        type: 'MEMBERSHIP',
+      },
+    });
+    if (transaction) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'You have already paid for the membership.',
+      );
+    }
   }
   if (purpose === 'MEMBERSHIP' && Number(amount) !== 1) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Membership payment is 1$.');
