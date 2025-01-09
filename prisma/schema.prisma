@@ -52,14 +52,15 @@ model Sponsor {
 }
 
 model Resource {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  authorId    String    @db.ObjectId
-  Author      User      @relation(fields: [authorId], references: [id])
+  authorId    String       @db.ObjectId
+  Author      User         @relation(fields: [authorId], references: [id])
   fileUrl     String?
   description String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  type        ResourceType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   Comments    Comment[]
 
   @@map("resources")
@@ -79,7 +80,8 @@ model Comment {
 
 model EventSponsor {
   id        String           @id @default(auto()) @map("_id") @db.ObjectId
-  tier      EventSponsorTier @default(SILVER)
+  tier      EventSponsorTier
+  fee       Float
   eventId   String           @db.ObjectId
   event     Event            @relation(fields: [eventId], references: [id])
   sponsorId String           @db.ObjectId
@@ -89,20 +91,24 @@ model EventSponsor {
 }
 
 model Event {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  hostId       String         @db.ObjectId
-  host         User           @relation(fields: [hostId], references: [id])
-  type         String?
-  title        String
-  imageUrl     String?
-  description  String
-  date         DateTime
-  eventFees    Float
-  startTime    DateTime?
-  endTime      DateTime?
-  venue        String
-  createdAt    DateTime       @default(now())
-  EventSponsor EventSponsor[]
+  id                       String         @id @default(auto()) @map("_id") @db.ObjectId
+  hostId                   String         @db.ObjectId
+  host                     User           @relation(fields: [hostId], references: [id])
+  type                     String?
+  title                    String
+  imageUrl                 String?
+  description              String
+  date                     DateTime
+  silverSponsorFee         Float
+  goldSponsorFee           Float
+  platinumSponsorFee       Float
+  silverSponsorAvailable   Boolean        @default(true)
+  goldSponsorAvailable     Boolean        @default(true)
+  platinumSponsorAvailable Boolean        @default(true)
+  endTime                  DateTime?
+  venue                    String
+  createdAt                DateTime       @default(now())
+  EventSponsor             EventSponsor[]
 
   @@map("events")
 }
@@ -155,4 +161,10 @@ enum UserStatus {
   PENDING
   INACTIVATE
   BLOCKED
+}
+
+enum ResourceType {
+  MEDIA
+  RESOURCE
+  BLOGS
 }

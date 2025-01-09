@@ -10,7 +10,7 @@ app.use(
     origin: [
       'http://localhost:3001',
       'http://localhost:3000',
-      'https://a786-182-252-68-225.ngrok-free.app',
+      'https://0764-182-252-68-225.ngrok-free.app',
     ],
     credentials: true,
   }),

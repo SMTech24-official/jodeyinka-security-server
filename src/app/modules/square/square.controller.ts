@@ -23,11 +23,28 @@ const createOneTimePaymentSession = catchAsync(
   },
 );
 
-const createSubscriptionSession = catchAsync(
-  async (req: Request, res: Response) => {},
+const createOneTimePaymentSessionSponsorship = catchAsync(
+  async (req: Request, res: Response) => {
+    const { sourceId, amount, tier } = req.body;
+    const userId = req.user.id;
+    const { eventId } = req.params;
+    const result = await squareServices.createOneTimePaymentSessionSponsorship(
+      amount,
+      sourceId,
+      tier,
+      userId,
+      eventId,
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Square payment session created successfully.',
+      data: result,
+    });
+  },
 );
 
 export const squareControllers = {
   createOneTimePaymentSession,
-  createSubscriptionSession,
+  createOneTimePaymentSessionSponsorship,
 };

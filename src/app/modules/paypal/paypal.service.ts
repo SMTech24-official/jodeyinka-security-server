@@ -58,7 +58,10 @@ const completeOrder = async (
 
     return;
   }
-  throw new AppError(httpStatus.BAD_REQUEST, 'Payment failed.');
+  throw new AppError(
+    httpStatus.BAD_REQUEST,
+    'Payment failed. Please try again',
+  );
 };
 
 export const paypalService = {

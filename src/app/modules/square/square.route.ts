@@ -7,5 +7,7 @@ const router = express.Router();
 router
   .route('/pay')
   .post(auth(), squareControllers.createOneTimePaymentSession);
-router.route('/subscribe');
+router
+  .route('/pay/event/:eventId')
+  .post(auth(), squareControllers.createOneTimePaymentSessionSponsorship);
 export const squareRouter = router;
