@@ -4,6 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { resourceServices } from './resource.service';
 import { uploadToS3 } from '../../helpers/fileUploaderToS3';
+import pickValidFields from '../../utils/pickValidFields';
 
 const createResource = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
@@ -32,7 +33,11 @@ const createResource = catchAsync(async (req: Request, res: Response) => {
 
 const getResources = catchAsync(async (req: Request, res: Response) => {
   const { type } = req.params;
-  const resources = await resourceServices.getResources(type);
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const resources = await resourceServices.getResources(
+    type,
+    paginationOptions,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

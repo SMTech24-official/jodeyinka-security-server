@@ -2,6 +2,8 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import prisma from '../../utils/prisma';
 import { ResourceType } from '@prisma/client';
+import { IPaginationOptions } from '../../interface/pagination.type';
+import { paginationHelpers } from '../../helpers/paginationHelper';
 
 const createResource = async (
   userId: string,
@@ -20,11 +22,18 @@ const createResource = async (
   return resource;
 };
 
-const getResources = async (type: string) => {
+const getResources = async (
+  type: string,
+  paginationOptions: IPaginationOptions,
+) => {
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
   const resources = await prisma.resource.findMany({
     where: {
       type: type as ResourceType,
     },
+    skip,
+    take: limit,
   });
   return resources;
 };
