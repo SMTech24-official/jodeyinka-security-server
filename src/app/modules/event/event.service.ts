@@ -22,6 +22,9 @@ const getUpcomingEvents = async (paginationOptions: IPaginationOptions) => {
         gt: new Date(),
       },
     },
+    orderBy: {
+      date: 'desc',
+    },
     skip,
     take: limit,
   });
