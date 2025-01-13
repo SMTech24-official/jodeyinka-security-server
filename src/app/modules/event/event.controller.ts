@@ -4,6 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { eventServices } from './event.service';
 import { uploadToS3 } from '../../helpers/fileUploaderToS3';
+import pickValidFields from '../../utils/pickValidFields';
 
 const createEvent = catchAsync(async (req: Request, res: Response) => {
   const hostId = req.user.id;
@@ -28,7 +29,9 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getUpcomingEvents = catchAsync(async (req: Request, res: Response) => {
-  const upcomingEvents = await eventServices.getUpcomingEvents();
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const upcomingEvents =
+    await eventServices.getUpcomingEvents(paginationOptions);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

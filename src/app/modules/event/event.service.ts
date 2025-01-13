@@ -1,3 +1,5 @@
+import { paginationHelpers } from '../../helpers/paginationHelper';
+import { IPaginationOptions } from '../../interface/pagination.type';
 import prisma from '../../utils/prisma';
 
 const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
@@ -11,13 +13,17 @@ const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
   return event;
 };
 
-const getUpcomingEvents = async () => {
+const getUpcomingEvents = async (paginationOptions: IPaginationOptions) => {
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
   const events = await prisma.event.findMany({
     where: {
       date: {
         gt: new Date(),
       },
     },
+    skip,
+    take: limit,
   });
   return events;
 };
