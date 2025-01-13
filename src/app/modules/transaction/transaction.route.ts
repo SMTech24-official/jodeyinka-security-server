@@ -10,4 +10,10 @@ router
     transactionControllers.getAllTransactions,
   );
 
+router.get(
+  '/my-transactions',
+  auth(),
+  transactionControllers.getUserTransactions,
+);
+
 export const transactionRouter = router;
