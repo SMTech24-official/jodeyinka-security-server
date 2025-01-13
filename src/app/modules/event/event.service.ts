@@ -21,7 +21,27 @@ const getUpcomingEvents = async () => {
   });
   return events;
 };
+const getSingleEvent = async (eventId: string) => {
+  const event = await prisma.event.findFirst({
+    where: {
+      id: eventId,
+    },
+    include: {
+      host: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          userName: true,
+          avatarUrl: true,
+        },
+      },
+    },
+  });
+  return event;
+};
 export const eventServices = {
   createEvent,
   getUpcomingEvents,
+  getSingleEvent,
 };
