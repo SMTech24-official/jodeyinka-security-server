@@ -54,7 +54,7 @@ export const createOrder = async (
         },
       ],
       application_context: {
-        return_url: `${config.BASE_URL}/paypal/complete-order?userId=${userId}&purpose=${purpose}`,
+        return_url: `http://localhost:3000/payment-complete?userId=${userId}&purpose=${purpose}`,
         cancel_url: `http://facebook.com`,
       },
     },
