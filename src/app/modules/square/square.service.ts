@@ -11,6 +11,7 @@ const createOneTimePaymentSession = async (
   purpose: string,
   userId: string,
 ) => {
+  let transaction;
   if (!amount) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Amount not defined.');
   }
@@ -42,7 +43,7 @@ const createOneTimePaymentSession = async (
   });
 
   if (response.result.payment?.status === 'COMPLETED') {
-    await prisma.$transaction(async prisma => {
+    transaction = await prisma.$transaction(async prisma => {
       if (purpose === 'MEMBERSHIP') {
         const user = await prisma.user.update({
           where: {
@@ -63,9 +64,13 @@ const createOneTimePaymentSession = async (
           currency: response.result.payment?.amountMoney?.currency as string,
         },
       });
+      return newTransaction;
     });
   }
-  return;
+  if (!transaction) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Payment was not completed.');
+  }
+  return transaction;
 };
 
 const createOneTimePaymentSessionSponsorship = async (

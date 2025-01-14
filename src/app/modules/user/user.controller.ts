@@ -103,6 +103,29 @@ const resendUserVerificationEmail = catchAsync(
   },
 );
 
+const getSponsorshipRequests = catchAsync(
+  async (req: Request, res: Response) => {
+    const sponsorshipRequests = await UserServices.getSponsorshipRequests();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Sponsorship Requests retrieved successfully.',
+      data: sponsorshipRequests,
+    });
+  },
+);
+
+const approveSponsorshipRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const sponsorshipRequests =
+      await UserServices.approveSponsorshipRequest(userId);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Sponsorship Requests retrieved successfully.',
+      data: sponsorshipRequests,
+    });
+  },
+);
 export const UserControllers = {
   registerUser,
   getAllUsers,
@@ -113,4 +136,6 @@ export const UserControllers = {
   changePassword,
   verifyUserEmail,
   resendUserVerificationEmail,
+  getSponsorshipRequests,
+  approveSponsorshipRequest,
 };

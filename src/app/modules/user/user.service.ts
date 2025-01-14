@@ -1,4 +1,4 @@
-import { User, UserStatus } from '@prisma/client';
+import { SponsorStatus, User, UserRoleEnum, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import prisma from '../../utils/prisma';
 import Email from '../../utils/email';
@@ -167,6 +167,27 @@ const resendUserVerificationEmail = async (email: string) => {
   return user;
 };
 
+const getSponsorshipRequests = async () => {
+  const sponsorshipRequests = await prisma.user.findMany({
+    where: {
+      sponsorStatus: SponsorStatus.PENDING,
+    },
+  });
+  return sponsorshipRequests;
+};
+
+const approveSponsorshipRequest = async (userId: string) => {
+  const sponsorshipRequests = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      sponsorStatus: SponsorStatus.APPROVED,
+      role: UserRoleEnum.SPONSOR,
+    },
+  });
+  return sponsorshipRequests;
+};
 export const UserServices = {
   registerUserIntoDB,
   getAllUsersFromDB,
@@ -177,4 +198,6 @@ export const UserServices = {
   changePassword,
   verifyUserEmail,
   resendUserVerificationEmail,
+  getSponsorshipRequests,
+  approveSponsorshipRequest,
 };

@@ -3,6 +3,7 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { UserControllers } from './user.controller';
 import { UserValidations } from './user.validation';
+import { UserRoleEnum } from '@prisma/client';
 const router = express.Router();
 
 router.post(
@@ -17,6 +18,17 @@ router.post(
 router.get('/', UserControllers.getAllUsers);
 
 router.get('/me', auth(), UserControllers.getMyProfile);
+router.get(
+  '/sponsorship-requests',
+  auth(UserRoleEnum.ADMIN, UserRoleEnum.SUPERADMIN),
+  UserControllers.getSponsorshipRequests,
+);
+
+router.patch(
+  '/approve-sponsor/:userId',
+  auth(UserRoleEnum.ADMIN, UserRoleEnum.SUPERADMIN),
+  UserControllers.approveSponsorshipRequest,
+);
 
 router.get('/:id', UserControllers.getUserDetails);
 router.put(
