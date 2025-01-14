@@ -75,6 +75,7 @@ const createOneTimePaymentSessionSponsorship = async (
   userId: string,
   eventId: string,
 ) => {
+  let transaction;
   const event = await prisma.event.findFirst({
     where: {
       id: eventId,
@@ -167,7 +168,7 @@ const createOneTimePaymentSessionSponsorship = async (
         },
       });
     });
-    await prisma.transaction.create({
+    const transaction = await prisma.transaction.create({
       data: {
         userId: userId,
         paymentId: response.result.payment.id as string,
@@ -177,8 +178,9 @@ const createOneTimePaymentSessionSponsorship = async (
         method: 'SquareUp',
       },
     });
+    return transaction;
   }
-  return;
+  throw new AppError(httpStatus.BAD_REQUEST, 'Transaction was incomplete.');
 };
 
 export const squareServices = {

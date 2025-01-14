@@ -99,6 +99,8 @@ model Event {
   imageUrl                 String?
   description              String
   date                     DateTime
+  latitude                 Float
+  longitude                Float
   silverSponsorFee         Float
   goldSponsorFee           Float
   platinumSponsorFee       Float

@@ -17,6 +17,17 @@ const getUserTransactions = async (userId: string) => {
   });
   return transactions;
 };
+
+const getAmountAggregate = async () => {
+  const result = await prisma.transaction.aggregate({
+    _sum: {
+      amount: true,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+};
 export const transactionServices = {
   getAllTransactions,
   getUserTransactions,
