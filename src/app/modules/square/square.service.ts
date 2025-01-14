@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { client } from '../../../config/square.config';
 import AppError from '../../errors/AppError';
 import prisma from '../../utils/prisma';
-import { EventSponsorTier } from '@prisma/client';
+import { EventSponsorTier, UserRoleEnum } from '@prisma/client';
 import { bigint } from 'square/dist/types/schema';
 
 const createOneTimePaymentSession = async (
@@ -49,7 +49,7 @@ const createOneTimePaymentSession = async (
             id: userId,
           },
           data: {
-            isMember: true,
+            role: UserRoleEnum.MEMBER,
           },
         });
       }

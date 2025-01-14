@@ -2,7 +2,6 @@ import { User, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import prisma from '../../utils/prisma';
 import Email from '../../utils/email';
-import { date } from 'zod';
 import { verification } from '../../helpers/generateEmailVerificationLink';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
@@ -10,6 +9,9 @@ import httpStatus from 'http-status';
 interface UserWithOptionalPassword extends Omit<User, 'password'> {
   password?: string;
 }
+const registerSponsor = async (userData: any, sponsorData: any) => {
+  return;
+};
 
 const registerUserIntoDB = async (payload: User) => {
   const hashedPassword: string = await bcrypt.hash(payload.password, 12);

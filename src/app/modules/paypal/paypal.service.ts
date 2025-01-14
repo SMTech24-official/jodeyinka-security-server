@@ -6,6 +6,7 @@ import {
   getPaypalOrder,
 } from '../../helpers/paypal';
 import prisma from '../../utils/prisma';
+import { UserRoleEnum } from '@prisma/client';
 
 const createPaymentSession = async (
   amount: string,
@@ -47,7 +48,7 @@ const completeOrder = async (
             id: userId,
           },
           data: {
-            isMember: true,
+            role: UserRoleEnum.MEMBER,
           },
         });
       }

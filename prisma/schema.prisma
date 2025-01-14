@@ -15,6 +15,7 @@ model User {
   firstName                     String
   lastName                      String
   userName                      String?
+  organizationName              String?
   email                         String          @unique
   country                       String
   state                         String?
@@ -26,14 +27,12 @@ model User {
   forgotPasswordOTP             String?
   forgotPasswordOTPExpires      DateTime?
   dob                           DateTime
-  isMember                      Boolean         @default(false)
   isEmailVerified               Boolean         @default(false)
   sponsorStatus                 SponsorStatus   @default(NONE)
   role                          UserRoleEnum    @default(USER)
   status                        UserStatus      @default(ACTIVE)
   createdAt                     DateTime        @default(now())
   updatedAt                     DateTime        @updatedAt
-  Sponsor                       Sponsor?
   Resources                     Resource[]
   Comment                       Comment[]
   Event                         Event[]
@@ -42,13 +41,6 @@ model User {
   EventSponsor                  EventSponsor[]
 
   @@map("users")
-}
-
-model Sponsor {
-  id   String @id @map("_id") @db.ObjectId
-  User User   @relation(fields: [id], references: [id])
-
-  @@map("sponsors")
 }
 
 model Resource {
@@ -142,6 +134,8 @@ model Transaction {
 
 enum UserRoleEnum {
   USER
+  SPONSOR
+  MEMBER
   ADMIN
   SUPERADMIN
 }
