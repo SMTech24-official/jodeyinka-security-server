@@ -6,7 +6,7 @@ const router = express.Router();
 
 router
   .route('/type/:type')
-  .get(auth(), resourceControllers.getResources)
+  .get(resourceControllers.getResources)
   .post(
     auth(),
     s3Multer.single('resourceFile'),

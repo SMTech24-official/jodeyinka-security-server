@@ -116,6 +116,7 @@ model EventsUser {
   userId  String @db.ObjectId
   user    User   @relation(fields: [userId], references: [id])
 
+  @@unique([eventId, userId])
   @@map("events_user")
 }
 

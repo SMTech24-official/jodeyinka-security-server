@@ -45,6 +45,11 @@ const getSingleEvent = async (eventId: string, userId: string) => {
           avatarUrl: true,
         },
       },
+      _count: {
+        select: {
+          EventsUser: true,
+        },
+      },
     },
   });
   const isUserRegistered =

@@ -44,7 +44,7 @@ router.put(
   UserControllers.updateUserRoleStatus,
 );
 
-router.post(
+router.put(
   '/change-password',
   auth('USER', 'ADMIN'),
   UserControllers.changePassword,
