@@ -6,7 +6,7 @@ const router = express.Router();
 router
   .route('/')
   .get(
-    auth(UserRoleEnum.SUPERADMIN),
+    auth(UserRoleEnum.ADMIN, UserRoleEnum.SUPERADMIN),
     transactionControllers.getAllTransactions,
   );
 
