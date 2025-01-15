@@ -32,12 +32,6 @@ const loginUserFromDB = async (payload: {
       'Your email is not verified, please check your email for the verification link.',
     );
   }
-  if (userData.sponsorStatus === 'PENDING') {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      'Your sponsorship request has not been approved yet. Please contact site admin.',
-    );
-  }
   const accessToken = await generateToken(
     {
       id: userData.id,
