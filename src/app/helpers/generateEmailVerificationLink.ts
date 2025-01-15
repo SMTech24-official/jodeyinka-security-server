@@ -6,7 +6,7 @@ const generateHashedToken = (token: string) => {
 };
 const generateEmailVerificationLink = () => {
   const token = crypto.randomBytes(32).toString('hex');
-  const emailVerificationLink = `http://localhost:${process.env.PORT}/api/v1/verify-email/${token}`;
+  const emailVerificationLink = `http://localhost:${process.env.FRONTEND_PORT}/verify-email/${token}`;
   const hashedToken = generateHashedToken(token);
   return [emailVerificationLink, hashedToken];
 };
