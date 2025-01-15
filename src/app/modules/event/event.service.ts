@@ -30,7 +30,7 @@ const getUpcomingEvents = async (paginationOptions: IPaginationOptions) => {
   });
   return events;
 };
-const getSingleEvent = async (eventId: string) => {
+const getSingleEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findFirst({
     where: {
       id: eventId,
@@ -47,7 +47,11 @@ const getSingleEvent = async (eventId: string) => {
       },
     },
   });
-  return event;
+  const isUserRegistered =
+    (await prisma.eventsUser.count({
+      where: { userId: userId, eventId: eventId },
+    })) > 0;
+  return { event, isUserRegistered };
 };
 export const eventServices = {
   createEvent,

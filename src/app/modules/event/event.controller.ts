@@ -42,7 +42,8 @@ const getUpcomingEvents = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
   const { eventId } = req.params;
-  const event = await eventServices.getSingleEvent(eventId);
+  const userId = req.user.id;
+  const event = await eventServices.getSingleEvent(eventId, userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
