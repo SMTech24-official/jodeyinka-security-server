@@ -9,9 +9,6 @@ import httpStatus from 'http-status';
 interface UserWithOptionalPassword extends Omit<User, 'password'> {
   password?: string;
 }
-const registerSponsor = async (userData: any, sponsorData: any) => {
-  return;
-};
 
 const registerUserIntoDB = async (payload: User) => {
   const hashedPassword: string = await bcrypt.hash(payload.password, 12);
@@ -19,7 +16,9 @@ const registerUserIntoDB = async (payload: User) => {
     ...payload,
     password: hashedPassword,
   };
-
+  if (payload.organizationName) {
+    userData.sponsorStatus = 'PENDING';
+  }
   const newUser = await prisma.user.create({
     data: {
       ...userData,
@@ -173,6 +172,7 @@ const getSponsorshipRequests = async () => {
       sponsorStatus: SponsorStatus.PENDING,
     },
   });
+
   return sponsorshipRequests;
 };
 
