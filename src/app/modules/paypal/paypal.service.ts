@@ -6,7 +6,7 @@ import {
   getPaypalOrder,
 } from '../../helpers/paypal';
 import prisma from '../../utils/prisma';
-import { UserRoleEnum } from '@prisma/client';
+import { TransactionTypeEnum, UserRoleEnum } from '@prisma/client';
 
 const createPaymentSession = async (
   amount: string,
@@ -37,7 +37,7 @@ const createPaymentSession = async (
 const completeOrder = async (
   userId: string,
   orderId: string,
-  purpose: string,
+  purpose: TransactionTypeEnum,
 ) => {
   const payment = await captureOrder(orderId);
   if (payment.status === 'COMPLETED') {

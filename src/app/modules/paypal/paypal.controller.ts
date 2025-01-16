@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { paypalService } from './paypal.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import { TransactionTypeEnum } from '@prisma/client';
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
@@ -23,7 +24,7 @@ const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
 const completeOrder = catchAsync(async (req: Request, res: Response) => {
   const userId = req.query.userId as string;
   const orderId = req.query.token as string;
-  const purpose = req.query.purpose as string;
+  const purpose = req.query.purpose as TransactionTypeEnum;
   const result = await paypalService.completeOrder(userId, orderId, purpose);
   sendResponse(res, {
     statusCode: httpStatus.OK,
