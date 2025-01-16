@@ -79,7 +79,7 @@ const createCommentOnResource = catchAsync(
 const getCommentsOnResource = catchAsync(
   async (req: Request, res: Response) => {
     const { resourceId } = req.params;
-    const comments = resourceServices.getCommentsOnResource(resourceId);
+    const comments = await resourceServices.getCommentsOnResource(resourceId);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

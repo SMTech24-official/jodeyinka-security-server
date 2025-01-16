@@ -16,6 +16,7 @@ router
 router.route('/:resourceId').get(resourceControllers.getSingleResource);
 router
   .route('/:resourceId/comment')
+  .get(auth(), resourceControllers.getCommentsOnResource)
   .post(auth(), resourceControllers.createCommentOnResource);
 
 export const resourceRouter = router;

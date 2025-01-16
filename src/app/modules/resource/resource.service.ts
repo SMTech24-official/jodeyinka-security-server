@@ -85,7 +85,29 @@ const createCommentOnResource = async (
 };
 
 const getCommentsOnResource = async (resourceId: string) => {
-  return;
+  const comments = await prisma.resource.findFirst({
+    where: {
+      id: resourceId,
+    },
+    select: {
+      Comments: {
+        select: {
+          id: true,
+          Author: {
+            select: {
+              id: true,
+              firstName: true,
+              userName: true,
+              avatarUrl: true,
+            },
+          },
+          content: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+  return comments;
 };
 
 export const resourceServices = {
