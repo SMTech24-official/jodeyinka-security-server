@@ -3,9 +3,12 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { transactionServices } from './transaction.service';
+import pickValidFields from '../../utils/pickValidFields';
 
 const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
-  const transactions = await transactionServices.getAllTransactions();
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const transactions =
+    await transactionServices.getAllTransactions(paginationOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -16,8 +19,12 @@ const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getUserTransactions = catchAsync(async (req: Request, res: Response) => {
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
   const userId = req.user.id;
-  const transactions = await transactionServices.getUserTransactions(userId);
+  const transactions = await transactionServices.getUserTransactions(
+    userId,
+    paginationOptions,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
