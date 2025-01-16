@@ -30,16 +30,31 @@ const getUserTransactions = async (
 };
 
 const getAmountAggregate = async () => {
-  const result = await prisma.transaction.aggregate({
+  const totalAmount = await prisma.transaction.aggregate({
     _sum: {
       amount: true,
     },
-    _count: {
-      _all: true,
+  });
+  const totalMember = await prisma.transaction.aggregate({
+    where: {
+      type: 'MEMBERSHIP',
+    },
+    _sum: {
+      amount: true,
     },
   });
+  const totalSponsor = await prisma.transaction.aggregate({
+    where: {
+      type: 'SPONSORSHIP',
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+  return { totalAmount, totalMember, totalSponsor };
 };
 export const transactionServices = {
   getAllTransactions,
   getUserTransactions,
+  getAmountAggregate,
 };

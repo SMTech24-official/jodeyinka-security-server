@@ -15,5 +15,10 @@ router.get(
   auth(),
   transactionControllers.getUserTransactions,
 );
+router.get(
+  '/amount-aggregate',
+  auth(),
+  transactionControllers.totalAmountAggregate,
+);
 
 export const transactionRouter = router;

@@ -33,7 +33,18 @@ const getUserTransactions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const totalAmountAggregate = catchAsync(async (req: Request, res: Response) => {
+  const result = await transactionServices.getAmountAggregate();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Transactions aggregate retrieved successfully.',
+    data: result,
+  });
+});
+
 export const transactionControllers = {
   getAllTransactions,
   getUserTransactions,
+  totalAmountAggregate,
 };
