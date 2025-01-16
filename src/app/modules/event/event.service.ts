@@ -1,8 +1,24 @@
+import httpStatus from 'http-status';
+import AppError from '../../errors/AppError';
 import { paginationHelpers } from '../../helpers/paginationHelper';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import prisma from '../../utils/prisma';
 
 const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
+  console.log(payLoad.date, new Date(), payLoad.date < new Date());
+
+  if (new Date(payLoad.date) < new Date()) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Event start date cannot be less that current date.',
+    );
+  }
+  if (new Date(payLoad.endTime) < new Date(payLoad.date)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Event end time cannot be less that start time.',
+    );
+  }
   const event = await prisma.event.create({
     data: {
       ...payLoad,
