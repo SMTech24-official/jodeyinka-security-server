@@ -25,6 +25,9 @@ const getUserTransactions = async (
     },
     skip,
     take: limit,
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
   return transactions;
 };

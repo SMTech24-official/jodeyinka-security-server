@@ -34,6 +34,9 @@ const getResources = async (
     },
     skip,
     take: limit,
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
   return resources;
 };
