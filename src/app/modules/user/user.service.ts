@@ -188,6 +188,15 @@ const approveSponsorshipRequest = async (userId: string) => {
   });
   return sponsorshipRequests;
 };
+
+const deleteSponsorshipRequest = async (userId: string) => {
+  const sponsorshipRequests = await prisma.user.delete({
+    where: {
+      id: userId,
+    },
+  });
+  return sponsorshipRequests;
+};
 export const UserServices = {
   registerUserIntoDB,
   getAllUsersFromDB,
@@ -200,4 +209,5 @@ export const UserServices = {
   resendUserVerificationEmail,
   getSponsorshipRequests,
   approveSponsorshipRequest,
+  deleteSponsorshipRequest,
 };

@@ -126,6 +126,19 @@ const approveSponsorshipRequest = catchAsync(
     });
   },
 );
+
+const deleteSponsorshipRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const sponsorshipRequests =
+      await UserServices.deleteSponsorshipRequest(userId);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Sponsorship Requests deleted successfully.',
+      data: sponsorshipRequests,
+    });
+  },
+);
 export const UserControllers = {
   registerUser,
   getAllUsers,
@@ -138,4 +151,5 @@ export const UserControllers = {
   resendUserVerificationEmail,
   getSponsorshipRequests,
   approveSponsorshipRequest,
+  deleteSponsorshipRequest,
 };

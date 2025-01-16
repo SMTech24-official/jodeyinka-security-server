@@ -67,7 +67,6 @@ const completeOrder = async (
         },
       });
     });
-
     return;
   }
   throw new AppError(

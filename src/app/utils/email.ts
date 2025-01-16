@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import nodemailer from 'nodemailer';
 export default class Email {
   to: string;

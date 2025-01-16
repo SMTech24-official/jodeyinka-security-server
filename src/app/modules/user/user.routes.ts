@@ -30,12 +30,14 @@ router.patch(
   UserControllers.approveSponsorshipRequest,
 );
 
-router.get('/:id', UserControllers.getUserDetails);
-router.put(
-  '/update-profile',
-  auth('USER', 'ADMIN'),
-  UserControllers.updateMyProfile,
+router.delete(
+  '/reject-sponsor/:userId',
+  auth(UserRoleEnum.ADMIN, UserRoleEnum.SUPERADMIN),
+  UserControllers.deleteSponsorshipRequest,
 );
+
+router.get('/:id', UserControllers.getUserDetails);
+router.put('/update-profile', auth(), UserControllers.updateMyProfile);
 router.patch('/verify-email/:token', UserControllers.verifyUserEmail);
 
 router.put(
