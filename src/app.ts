@@ -11,6 +11,7 @@ app.use(
       'http://localhost:3001',
       'http://localhost:3000',
       'https://22af-182-252-68-225.ngrok-free.app',
+      'https://my-app-nine-tau-26.vercel.app'
     ],
     credentials: true,
   }),
