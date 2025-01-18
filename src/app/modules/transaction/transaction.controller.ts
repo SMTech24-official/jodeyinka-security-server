@@ -11,9 +11,9 @@ const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
     await transactionServices.getAllTransactions(paginationOptions);
 
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     success: true,
-    message: 'Resource created successfully.',
+    message: 'All transactions retrieved successfully.',
     data: transactions,
   });
 });
