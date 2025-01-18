@@ -118,8 +118,32 @@ const resetPassword = async (email: string, otp: string, password: string) => {
       forgotPasswordOTPExpires: null,
     },
   });
-
   return;
+};
+
+const refreshToken = async (userId: string) => {
+  const userData = await prisma.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+  if (!userData) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'The user is not available anymore.',
+    );
+  }
+  const accessToken = await generateToken(
+    {
+      id: userData.id,
+      name: userData.firstName,
+      email: userData.email,
+      role: userData.role,
+    },
+    config.jwt.access_secret as Secret,
+    config.jwt.access_expires_in as string,
+  );
+  return accessToken;
 };
 
 export const AuthServices = {
@@ -127,4 +151,5 @@ export const AuthServices = {
   forgotPassword,
   enterOTP,
   resetPassword,
+  refreshToken,
 };
