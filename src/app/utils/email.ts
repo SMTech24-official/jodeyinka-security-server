@@ -11,7 +11,7 @@ export default class Email {
   }
 
   newTransport() {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'productio') {
       //Sending real email with Brevo
       return nodemailer.createTransport({
         host: process.env.EMAIL_BREVO_HOST,
