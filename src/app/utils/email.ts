@@ -7,19 +7,19 @@ export default class Email {
   constructor(user: any) {
     this.to = user.email || 'admin@gmail.com';
     this.firstName = user.firstName || 'admin';
-    this.from = `Mashrafie Rahim Sheikh <${process.env.EMAIL_FROM}>`;
+    this.from = `WSF <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
-    if (process.env.NODE_ENV === 'productio') {
+    if (process.env.NODE_ENV === 'production') {
       //Sending real email with Brevo
       return nodemailer.createTransport({
-        host: process.env.EMAIL_BREVO_HOST,
-        port: process.env.EMAIL_BREVO_PORT,
+        host: process.env.ZOHO_HOST,
+        port: process.env.ZOHO_PORT,
         secure: false,
         auth: {
-          user: process.env.EMAIL_BREVO_USER,
-          pass: process.env.EMAIL_BREVO_PASSWORD,
+          user: process.env.ZOHO_USER,
+          pass: process.env.ZOHO_PASSWORD,
         },
       } as any);
     }

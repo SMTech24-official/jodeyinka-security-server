@@ -11,11 +11,12 @@ app.use(
       'http://localhost:3001',
       'http://localhost:3000',
       'https://22af-182-252-68-225.ngrok-free.app',
-      'https://my-app-nine-tau-26.vercel.app'
+      'https://my-app-nine-tau-26.vercel.app',
     ],
     credentials: true,
   }),
 );
+console.log(process.env.NODE_ENV);
 
 //parser
 app.use(express.json());
