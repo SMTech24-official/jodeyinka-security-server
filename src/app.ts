@@ -16,7 +16,6 @@ app.use(
     credentials: true,
   }),
 );
-console.log(process.env.NODE_ENV);
 
 //parser
 app.use(express.json());

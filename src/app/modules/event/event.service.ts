@@ -5,8 +5,6 @@ import { IPaginationOptions } from '../../interface/pagination.type';
 import prisma from '../../utils/prisma';
 
 const createEvent = async (payLoad: any, fileUrl: any, hostId: string) => {
-  console.log(payLoad.date, new Date(), payLoad.date < new Date());
-
   if (new Date(payLoad.date) < new Date()) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
