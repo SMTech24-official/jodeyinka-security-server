@@ -11,8 +11,10 @@ export default class Email {
   }
 
   newTransport() {
+    console.log(process.env.NODE_ENV === 'production');
+
     if (process.env.NODE_ENV === 'production') {
-      //Sending real email with Brevo
+      //Sending real email with ZOHO
       return nodemailer.createTransport({
         host: process.env.ZOHO_HOST,
         port: process.env.ZOHO_PORT,
@@ -20,6 +22,9 @@ export default class Email {
         auth: {
           user: process.env.ZOHO_USER,
           pass: process.env.ZOHO_PASSWORD,
+        },
+        tls: {
+          rejectUnauthorized: false,
         },
       } as any);
     }

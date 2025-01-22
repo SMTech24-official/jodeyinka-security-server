@@ -24,8 +24,8 @@ const registerUserIntoDB = async (payload: User) => {
       ...userData,
     },
   });
-  await resendUserVerificationEmail(newUser.email);
 
+  await resendUserVerificationEmail(newUser.email);
   const userWithOptionalPassword = newUser as UserWithOptionalPassword;
   delete userWithOptionalPassword.password;
 
@@ -157,7 +157,6 @@ const resendUserVerificationEmail = async (email: string) => {
       emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000),
     },
   });
-
   const emailSender = new Email(user);
   await emailSender.sendEmailVerificationLink(
     'Email verification link',
