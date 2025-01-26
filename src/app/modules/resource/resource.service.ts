@@ -37,6 +37,14 @@ const getResources = async (
     orderBy: {
       createdAt: 'desc',
     },
+    include: {
+      Author: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
   });
   return resources;
 };
