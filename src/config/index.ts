@@ -31,4 +31,7 @@ export default {
     SQUAREUP_ACCESS_TOKEN: process.env.SQUAREUP_ACCESS_TOKEN,
     SQUAREUP_BASE_URL: process.env.SQUAREUP_BASE_URL,
   },
+  gRecaptcha: {
+    RECAPTCHA_SECRET: process.env.RECAPTCHA_SECRET,
+  },
 };
