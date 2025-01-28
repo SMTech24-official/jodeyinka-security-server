@@ -8,7 +8,10 @@ import prisma from '../../utils/prisma';
 import { UserServices } from '../user/user.service';
 import Email from '../../utils/email';
 
-const loginUserFromDB = async (payload: any) => {
+const loginUserFromDB = async (payload: {
+  email: string;
+  password: string;
+}) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
