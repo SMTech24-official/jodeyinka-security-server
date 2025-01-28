@@ -16,6 +16,7 @@ const validateRecaptchaTokenMiddleware = catchAsync(
       `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`,
     );
     const data = response.data;
+    console.log(data);
 
     if (data.success) {
       next(); // reCAPTCHA verification succeeded, proceed to the next middleware
