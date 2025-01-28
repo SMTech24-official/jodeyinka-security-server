@@ -3,6 +3,7 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import router from './app/routes';
+import { gRecaptchaController } from './app/modules/gRecaptcha/gRecaptcha.controller';
 
 const app: Application = express();
 app.use(
@@ -27,7 +28,10 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
+app.use(gRecaptchaController.validateRecaptchaTokenMiddleware);
 app.use('/api/v1', router);
+
+// middleware for google recaptcha
 
 app.use(globalErrorHandler);
 
