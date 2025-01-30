@@ -12,8 +12,8 @@ router
     s3Multer.single('resourceFile'),
     resourceControllers.createResource,
   );
-
-router.route('/:resourceId').get(resourceControllers.getSingleResource);
+router.route('/trending').get(auth(), resourceControllers.getTrendingResources);
+router.route('/:resourceId').get(auth(), resourceControllers.getSingleResource);
 router
   .route('/:resourceId/comment')
   .get(auth(), resourceControllers.getCommentsOnResource)

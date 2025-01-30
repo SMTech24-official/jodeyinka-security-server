@@ -89,10 +89,21 @@ const getCommentsOnResource = catchAsync(
   },
 );
 
+const getTrendingResources = catchAsync(async (req: Request, res: Response) => {
+  const trending = await resourceServices.getTrendingResources();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Trending resources retrieved successfully.',
+    data: trending,
+  });
+});
+
 export const resourceControllers = {
   createResource,
   getResources,
   getSingleResource,
   createCommentOnResource,
   getCommentsOnResource,
+  getTrendingResources,
 };
