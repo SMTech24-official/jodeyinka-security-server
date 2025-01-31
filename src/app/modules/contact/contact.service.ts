@@ -1,7 +1,7 @@
 import Email from '../../utils/email';
 
 const sendContactMessage = async (data: any) => {
-  await new Email({}).sendContactMail({ data });
+  await new Email({}).sendContactMail(data);
   return;
 };
 

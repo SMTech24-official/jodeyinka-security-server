@@ -5,7 +5,8 @@ import httpStatus from 'http-status';
 import { contactServices } from './contact.service';
 
 const sendContactMessage = catchAsync(async (req: Request, res: Response) => {
-  const { data } = req.body;
+  const data = req.body;
+
   const result = await contactServices.sendContactMessage(data);
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -53,7 +53,7 @@ const loginUserFromDB = async (payload: {
 
 const forgotPassword = async (email: string) => {
   const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+  const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
   const user = await prisma.user.update({
     where: {
       email: email,
