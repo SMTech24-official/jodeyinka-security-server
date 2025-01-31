@@ -9,6 +9,7 @@ import { squareRouter } from '../modules/square/square.route';
 import { resourceRouter } from '../modules/resource/resource.route';
 import { transactionRouter } from '../modules/transaction/transaction.route';
 import { eventUsersRouter } from '../modules/eventUsers/eventUsers.route';
+import { notificationRouter } from '../modules/notification/notification.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -47,6 +48,10 @@ const moduleRoutes = [
   {
     path: '/event-users',
     route: eventUsersRouter,
+  },
+  {
+    path: '/notification',
+    route: notificationRouter,
   },
 ];
 
