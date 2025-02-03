@@ -14,6 +14,7 @@ app.use(
       'https://22af-182-252-68-225.ngrok-free.app',
       'https://my-app-nine-tau-26.vercel.app',
       'https://cors-test.codehappy.dev/',
+      'chrome-extension://cbdhgldgiancdheindpekpcbkccpjaeb',
     ],
     credentials: true,
   }),
