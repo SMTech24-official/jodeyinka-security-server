@@ -10,11 +10,10 @@ app.use(
   cors({
     origin: [
       'http://localhost:3001',
+      'http://104.236.194.254:5700',
       'http://localhost:3000',
       'https://22af-182-252-68-225.ngrok-free.app',
       'https://my-app-nine-tau-26.vercel.app',
-      'https://cors-test.codehappy.dev/',
-      'chrome-extension://cbdhgldgiancdheindpekpcbkccpjaeb',
     ],
     credentials: true,
   }),
