@@ -55,7 +55,7 @@ export const createOrder = async (
       ],
       application_context: {
         return_url: `https://my-app-nine-tau-26.vercel.app/payment-complete?userId=${userId}&purpose=${purpose}`,
-        cancel_url: `http://facebook.com`,
+        cancel_url: `https://my-app-nine-tau-26.vercel.app/?payment=canceled`,
       },
     },
   });
