@@ -52,7 +52,32 @@ const getSingleResource = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Resources retrieved successfully.',
+    message: 'Resource retrieved successfully.',
+    data: resource,
+  });
+});
+const updateSingleResource = catchAsync(async (req: Request, res: Response) => {
+  const { resourceId } = req.params;
+  const payload = req.body;
+  const resource = await resourceServices.updateSingleResource(
+    resourceId,
+    payload,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Resource updated successfully.',
+    data: resource,
+  });
+});
+
+const deleteSingleResource = catchAsync(async (req: Request, res: Response) => {
+  const { resourceId } = req.params;
+  const resource = await resourceServices.deleteSingleResource(resourceId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Resource deleted successfully.',
     data: resource,
   });
 });
@@ -103,6 +128,8 @@ export const resourceControllers = {
   createResource,
   getResources,
   getSingleResource,
+  updateSingleResource,
+  deleteSingleResource,
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,

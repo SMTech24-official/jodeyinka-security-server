@@ -50,7 +50,7 @@ const getResources = async (
 };
 
 const getSingleResource = async (resourceId: string) => {
-  const resources = await prisma.resource.findFirst({
+  const resource = await prisma.resource.findFirst({
     where: {
       id: resourceId,
     },
@@ -77,7 +77,28 @@ const getSingleResource = async (resourceId: string) => {
       },
     },
   });
-  return resources;
+  return resource;
+};
+
+const deleteSingleResource = async (resourceId: string) => {
+  const resource = await prisma.resource.delete({
+    where: {
+      id: resourceId,
+    },
+  });
+  return resource;
+};
+
+const updateSingleResource = async (resourceId: string, payload: any) => {
+  const resource = await prisma.resource.update({
+    where: {
+      id: resourceId,
+    },
+    data: {
+      ...payload,
+    },
+  });
+  return resource;
 };
 
 const createCommentOnResource = async (
@@ -157,6 +178,8 @@ export const resourceServices = {
   createResource,
   getResources,
   getSingleResource,
+  updateSingleResource,
+  deleteSingleResource,
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,

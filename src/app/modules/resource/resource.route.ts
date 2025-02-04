@@ -13,7 +13,11 @@ router
     resourceControllers.createResource,
   );
 router.route('/trending').get(auth(), resourceControllers.getTrendingResources);
-router.route('/:resourceId').get(auth(), resourceControllers.getSingleResource);
+router
+  .route('/:resourceId')
+  .get(auth(), resourceControllers.getSingleResource)
+  .patch(auth(), resourceControllers.updateSingleResource)
+  .delete(auth(), resourceControllers.deleteSingleResource);
 router
   .route('/:resourceId/comment')
   .get(auth(), resourceControllers.getCommentsOnResource)
