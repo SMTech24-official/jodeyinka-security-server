@@ -16,7 +16,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Expose the port so that we can access it from outside
-EXPOSE 5000
+EXPOSE 5199
 
 # start command
 CMD [ "npm","start" ]
