@@ -8,7 +8,7 @@ const superAdminData = {
   lastName: 'Admin',
   email: 'admin@gmail.com',
   password: 'admin1234',
-  role: UserRoleEnum.SUPERADMIN,
+  role: UserRoleEnum.ADMIN,
   dob: '2002-05-22T00:00:00Z',
   country: 'Dhaka',
 };
@@ -18,7 +18,7 @@ const seedSuperAdmin = async () => {
     // Check if a super admin already exists
     const isSuperAdminExists = await prisma.user.findFirst({
       where: {
-        role: UserRoleEnum.SUPERADMIN,
+        role: UserRoleEnum.ADMIN,
       },
     });
 
