@@ -54,8 +54,8 @@ export const createOrder = async (
         },
       ],
       application_context: {
-        return_url: `https://my-app-nine-tau-26.vercel.app/payment-complete?userId=${userId}&purpose=${purpose}`,
-        cancel_url: `https://my-app-nine-tau-26.vercel.app/?payment=canceled`,
+        return_url: `https://www.worldcybersecurityforum.org/payment-complete?userId=${userId}&purpose=${purpose}`,
+        cancel_url: `https://www.worldcybersecurityforum.org/?payment=canceled`,
       },
     },
   });

@@ -2,8 +2,11 @@ import httpStatus from 'http-status';
 import { client } from '../../../config/square.config';
 import AppError from '../../errors/AppError';
 import prisma from '../../utils/prisma';
-import { EventSponsorTier, TransactionTypeEnum, UserRoleEnum } from '@prisma/client';
-import { bigint } from 'square/dist/types/schema';
+import {
+  EventSponsorTier,
+  TransactionTypeEnum,
+  UserRoleEnum,
+} from '@prisma/client';
 
 const createOneTimePaymentSession = async (
   amount: number,
