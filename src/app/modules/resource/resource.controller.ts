@@ -46,6 +46,23 @@ const getResources = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserResources = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const { type } = req.params;
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const resources = await resourceServices.getUserResources(
+    userId,
+    type,
+    paginationOptions,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Resources retrieved successfully.',
+    data: resources,
+  });
+});
+
 const getSingleResource = catchAsync(async (req: Request, res: Response) => {
   const { resourceId } = req.params;
   const resource = await resourceServices.getSingleResource(resourceId);
@@ -127,6 +144,7 @@ const getTrendingResources = catchAsync(async (req: Request, res: Response) => {
 export const resourceControllers = {
   createResource,
   getResources,
+  getUserResources,
   getSingleResource,
   updateSingleResource,
   deleteSingleResource,

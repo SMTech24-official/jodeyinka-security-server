@@ -49,6 +49,35 @@ const getResources = async (
   return resources;
 };
 
+const getUserResources = async (
+  userId: string,
+  type: string,
+  paginationOptions: IPaginationOptions,
+) => {
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
+  const resources = await prisma.resource.findMany({
+    where: {
+      type: type as ResourceType,
+      authorId: userId,
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      Author: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+  return resources;
+};
+
 const getSingleResource = async (resourceId: string) => {
   const resource = await prisma.resource.findFirst({
     where: {
@@ -177,6 +206,7 @@ const getTrendingResources = async () => {
 export const resourceServices = {
   createResource,
   getResources,
+  getUserResources,
   getSingleResource,
   updateSingleResource,
   deleteSingleResource,

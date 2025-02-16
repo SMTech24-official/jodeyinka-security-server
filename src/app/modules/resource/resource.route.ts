@@ -12,6 +12,10 @@ router
     s3Multer.single('resourceFile'),
     resourceControllers.createResource,
   );
+router
+  .route('/user/type/:type')
+  .get(auth(), resourceControllers.getUserResources);
+
 router.route('/trending').get(auth(), resourceControllers.getTrendingResources);
 router
   .route('/:resourceId')
