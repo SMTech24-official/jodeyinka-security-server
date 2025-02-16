@@ -6,7 +6,7 @@ const generateHashedToken = (token: string) => {
 };
 const generateEmailVerificationLink = () => {
   const token = crypto.randomBytes(32).toString('hex');
-  const emailVerificationLink = `https://my-app-nine-tau-26.vercel.app/verify-email/${token}`;
+  const emailVerificationLink = `https://www.worldcybersecurityforum.org/verify-email/${token}`;
   const hashedToken = generateHashedToken(token);
   return [emailVerificationLink, hashedToken];
 };
