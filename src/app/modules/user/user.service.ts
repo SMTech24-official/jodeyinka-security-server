@@ -5,6 +5,7 @@ import Email from '../../utils/email';
 import { verification } from '../../helpers/generateEmailVerificationLink';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import { uploadToS3 } from '../../helpers/fileUploaderToS3';
 
 interface UserWithOptionalPassword extends Omit<User, 'password'> {
   password?: string;
@@ -55,9 +56,25 @@ const getUserDetailsFromDB = async (id: string) => {
   return user;
 };
 
-const updateMyProfileIntoDB = async (id: string, payload: any) => {
+const updateMyProfileIntoDB = async (
+  id: string,
+  payload: any,
+  files: Express.Multer.File[],
+) => {
   const userData = payload;
+  let fileUrls: string[] = [];
   delete userData.password;
+  if (files) {
+    for (const file of files) {
+      const fileBuffer = file.buffer;
+      const originalName = file.originalname;
+      const mimeType = file.mimetype;
+      const fileUrl = await uploadToS3(fileBuffer, originalName, mimeType);
+      fileUrls.push(fileUrl);
+    }
+    userData.avatarUrl = fileUrls[0];
+  }
+
   // update user data
   const updatedUser = await prisma.user.update({
     where: { id },

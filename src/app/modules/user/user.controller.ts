@@ -60,7 +60,11 @@ const getUserDetails = catchAsync(async (req, res) => {
 
 const updateMyProfile = catchAsync(async (req, res) => {
   const id = req.user.id;
-  const result = await UserServices.updateMyProfileIntoDB(id, req.body);
+  const payload = JSON.parse(req.body.bodyData);
+  const files = Array.isArray(req.files)
+    ? req.files
+    : (req.files?.profileImage as Express.Multer.File[]);
+  const result = await UserServices.updateMyProfileIntoDB(id, payload, files);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

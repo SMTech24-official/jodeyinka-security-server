@@ -4,6 +4,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { UserControllers } from './user.controller';
 import { UserValidations } from './user.validation';
 import { UserRoleEnum } from '@prisma/client';
+import { s3Multer } from '../../helpers/fileUploaderToS3';
 const router = express.Router();
 
 router.post(
@@ -37,7 +38,12 @@ router.delete(
 );
 
 router.get('/:id', UserControllers.getUserDetails);
-router.put('/update-profile', auth(), UserControllers.updateMyProfile);
+router.put(
+  '/update-profile',
+  auth(),
+  s3Multer.fields([{ name: 'profileImage', maxCount: 1 }]),
+  UserControllers.updateMyProfile,
+);
 router.patch('/verify-email/:token', UserControllers.verifyUserEmail);
 
 router.put(
