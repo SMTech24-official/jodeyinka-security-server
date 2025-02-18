@@ -30,7 +30,6 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-console.log(process.env.NODE_ENV);
 app.use(gRecaptchaController.validateRecaptchaTokenMiddleware);
 app.use('/api/v1', router);
 app.use(globalErrorHandler);

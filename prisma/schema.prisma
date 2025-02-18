@@ -62,7 +62,7 @@ model Resource {
 model Comment {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   resourceId String   @db.ObjectId
-  Resource   Resource @relation(fields: [resourceId], references: [id])
+  Resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   authorId   String   @db.ObjectId
   Author     User     @relation(fields: [authorId], references: [id])
   content    String
