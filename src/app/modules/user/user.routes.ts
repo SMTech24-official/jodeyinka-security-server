@@ -52,10 +52,6 @@ router.put(
   UserControllers.updateUserRoleStatus,
 );
 
-router.put(
-  '/change-password',
-  auth('USER', 'ADMIN'),
-  UserControllers.changePassword,
-);
+router.put('/change-password', auth(), UserControllers.changePassword);
 
 export const UserRouter = router;
