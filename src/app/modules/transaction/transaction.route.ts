@@ -21,4 +21,6 @@ router.get(
   transactionControllers.totalAmountAggregate,
 );
 
+router.get('/about-us-aggregate', transactionControllers.aboutUsAggregate);
+
 export const transactionRouter = router;

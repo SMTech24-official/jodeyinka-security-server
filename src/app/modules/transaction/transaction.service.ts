@@ -56,8 +56,36 @@ const getAmountAggregate = async () => {
   });
   return { totalAmount, totalMember, totalSponsor };
 };
+
+const aboutUsAggregate = async () => {
+  const membersCount = await prisma.user.count({
+    where: {
+      role: 'MEMBER',
+    },
+  });
+  const sponsorsCount = await prisma.user.count({
+    where: {
+      role: 'SPONSOR',
+    },
+  });
+  const organizedEventsCount = await prisma.event.count({
+    where: {
+      date: {
+        lt: new Date(),
+      },
+    },
+  });
+  const resourcesCount = await prisma.resource.count({});
+  return {
+    membersCount,
+    sponsorsCount,
+    organizedEventsCount,
+    resourcesCount,
+  };
+};
 export const transactionServices = {
   getAllTransactions,
   getUserTransactions,
   getAmountAggregate,
+  aboutUsAggregate,
 };
