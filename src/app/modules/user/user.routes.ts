@@ -51,7 +51,7 @@ router.put(
   auth('ADMIN'),
   UserControllers.updateUserRoleStatus,
 );
-
+router.patch('/toggle-2fa', auth(), UserControllers.toggle2fa);
 router.put('/change-password', auth(), UserControllers.changePassword);
 
 export const UserRouter = router;

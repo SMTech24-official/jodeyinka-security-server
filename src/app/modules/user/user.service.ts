@@ -205,6 +205,23 @@ const approveSponsorshipRequest = async (userId: string) => {
   return sponsorshipRequests;
 };
 
+const toggle2fa = async (userId: string) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      twoFactor: !user.twoFactor,
+    },
+  });
+  return;
+};
+
 const deleteSponsorshipRequest = async (userId: string) => {
   const sponsorshipRequests = await prisma.user.delete({
     where: {
@@ -226,4 +243,5 @@ export const UserServices = {
   getSponsorshipRequests,
   approveSponsorshipRequest,
   deleteSponsorshipRequest,
+  toggle2fa,
 };

@@ -131,6 +131,17 @@ const approveSponsorshipRequest = catchAsync(
   },
 );
 
+const toggle2fa = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id;
+  const result = await UserServices.toggle2fa(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Result retrieved successfully.',
+    data: result,
+  });
+});
+
 const deleteSponsorshipRequest = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params;
@@ -155,5 +166,6 @@ export const UserControllers = {
   resendUserVerificationEmail,
   getSponsorshipRequests,
   approveSponsorshipRequest,
+  toggle2fa,
   deleteSponsorshipRequest,
 };
