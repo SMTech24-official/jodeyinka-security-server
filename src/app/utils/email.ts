@@ -7,7 +7,7 @@ export default class Email {
   constructor(user: any) {
     this.to = user.email || process.env.EMAIL_FROM;
     this.firstName = user.firstName || 'admin';
-    this.from = `WSF <${process.env.EMAIL_FROM}>`;
+    this.from = `World Cybersecurity Forum <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
@@ -303,13 +303,13 @@ export default class Email {
     <div class="container">
         <div class="header">
             <div class="logo-container">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%2010-SBHTzfihpSfeUtsH8IHib5Yb1SHW5W.png" alt="WSF Logo" class="logo">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%2010-SBHTzfihpSfeUtsH8IHib5Yb1SHW5W.png" alt="WCF Logo" class="logo">
             </div>
         </div>
         <div class="content">
             <h1 class="title">Password Reset Code</h1>
             <p class="text">Hello,</p>
-            <p class="text">We received a request to reset the password for your WSF account. Use the code below to complete the password reset process:</p>
+            <p class="text">We received a request for an OTP for your WCF account. Use the code below to complete the verification process:</p>
             
             <div class="otp-container">
                 <p class="otp-code">${OTP}</p>
@@ -318,7 +318,7 @@ export default class Email {
 
             <div class="security-notice">
                 <p class="text" style="margin: 0;">
-                    <strong>Security Notice:</strong> If you didn't request a password reset, please ignore this email or contact our support team immediately. Someone may be trying to access your account.
+                    <strong>Security Notice:</strong> If you didn't request an OTP, please ignore this email or contact our support team immediately. Someone may be trying to access your account.
                 </p>
             </div>
 
@@ -328,15 +328,15 @@ export default class Email {
             <ul>
                 <li>Never share this code with anyone</li>
                 <li>WSF will never ask you for this code via phone or email</li>
-                <li>Always ensure you're on the official WSF website before entering this code</li>
+                <li>Always ensure you're on the official WCF website before entering this code</li>
             </ul>
             
             <p class="text">Need help or have concerns? Contact our support team at <span class="highlight">members@worldcybersecurityforum.org</span></p>
         </div>
         <div class="footer">
-            <p class="footer-text">&copy; 2024 WSF. All rights reserved.</p>
+            <p class="footer-text">&copy; 2024 WCF. All rights reserved.</p>
             <p class="footer-text">This is an automated message, please do not reply to this email.</p>
-            <p class="footer-text">Sent by WSF • Password Reset Service</p>
+            <p class="footer-text">Sent by WCF • OTP verification Service</p>
         </div>
     </div>
 </body>

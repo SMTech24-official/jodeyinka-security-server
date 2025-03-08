@@ -32,6 +32,12 @@ const loginUserFromDB = async (payload: {
       'Your email is not verified, please check your email for the verification link.',
     );
   }
+  if (userData.twoFactor) {
+    await forgotPassword(userData.email);
+    return {
+      message: 'OTP sent to the mail successfully. Please check your email.',
+    };
+  }
   const accessToken = await generateToken(
     {
       id: userData.id,
@@ -49,6 +55,7 @@ const loginUserFromDB = async (payload: {
     email: userData.email,
     role: userData.role,
     accessToken: accessToken,
+    message: 'Logged in successfully.',
   };
 };
 
@@ -88,7 +95,18 @@ const enterOTP = async (otp: string) => {
       'OTP has expired, please try again resending the OTP.',
     );
   }
-  return;
+  const accessToken = await generateToken(
+    {
+      id: user.id,
+      name: user.firstName,
+      email: user.email,
+      role: user.role,
+      sponsorStatus: user.sponsorStatus,
+    },
+    config.jwt.access_secret as Secret,
+    config.jwt.access_expires_in as string,
+  );
+  return accessToken;
 };
 
 const resetPassword = async (email: string, otp: string, password: string) => {
