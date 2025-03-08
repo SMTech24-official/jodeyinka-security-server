@@ -25,7 +25,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 
 const enterOTP = catchAsync(async (req: Request, res: Response) => {
   const { otp } = req.body;
-  const { type } = req.query;
+  const { type }: { type?: string } = req.query;
   const result = await AuthServices.enterOTP(otp, type);
   sendResponse(res, {
     statusCode: httpStatus.OK,
