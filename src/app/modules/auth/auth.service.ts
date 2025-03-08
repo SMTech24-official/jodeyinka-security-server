@@ -76,7 +76,7 @@ const forgotPassword = async (email: string) => {
   return;
 };
 
-const enterOTP = async (otp: string) => {
+const enterOTP = async (otp: string, type: string | undefined) => {
   const user = await prisma.user.findFirst({
     where: {
       forgotPasswordOTP: otp,
@@ -94,6 +94,17 @@ const enterOTP = async (otp: string) => {
       httpStatus.BAD_REQUEST,
       'OTP has expired, please try again resending the OTP.',
     );
+  }
+  if (type === '2fa') {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        forgotPasswordOTP: null,
+        forgotPasswordOTPExpires: null,
+      },
+    });
   }
   const accessToken = await generateToken(
     {
