@@ -22,6 +22,7 @@ model User {
   address                       String?
   avatarUrl                     String?
   password                      String
+  twoFactor                     Boolean         @default(false)
   emailVerificationToken        String?
   emailVerificationTokenExpires DateTime?
   forgotPasswordOTP             String?
