@@ -197,7 +197,7 @@ export default class Email {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset Code - WSF</title>
+    <title>OTP - WCF</title>
     <style>
         body {
             margin: 0;
@@ -213,15 +213,33 @@ export default class Email {
         }
         .header {
             background-color: #000033;
-            padding: 32px 24px;
-            text-align: center;
+            padding: 24px;
+            background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Rectangle%207-ZeT2eg7R8OPh1ZUMsJzVmDmh6wBngH.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
         }
         .logo-container {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 51, 0.7);
+            padding: 12px;
+            border-radius: 8px;
         }
         .logo {
-            width: 140px;
+            width: 50px;
             height: auto;
+            margin-right: 15px;
+        }
+        .organization-name {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
         }
         .content {
             padding: 48px 24px;
@@ -296,14 +314,20 @@ export default class Email {
             .otp-code {
                 font-size: 28px;
             }
+            .organization-name {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-container">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%2010-SBHTzfihpSfeUtsH8IHib5Yb1SHW5W.png" alt="WCF Logo" class="logo">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Z3fxIkmDKsU2g2YMHMo0dtHExynWwz.png" alt="WCF Logo" class="logo">
+                    <h2 class="organization-name">World Cybersecurity Forum</h2>
+                </div>
             </div>
         </div>
         <div class="content">
@@ -327,7 +351,7 @@ export default class Email {
             <p class="text">For your security:</p>
             <ul>
                 <li>Never share this code with anyone</li>
-                <li>WSF will never ask you for this code via phone or email</li>
+                <li>WCF will never ask you for this code via phone or email</li>
                 <li>Always ensure you're on the official WCF website before entering this code</li>
             </ul>
             
@@ -341,7 +365,7 @@ export default class Email {
     </div>
 </body>
 </html>`;
-    await this.send(html, 'Reset your password');
+    await this.send(html, 'WCF OTP');
   }
 
   async sendContactMail(data: any) {

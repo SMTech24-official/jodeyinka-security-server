@@ -25,8 +25,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 
 const enterOTP = catchAsync(async (req: Request, res: Response) => {
   const { otp } = req.body;
-  const { type }: { type?: string } = req.query;
-  const result = await AuthServices.enterOTP(otp, type);
+  const result = await AuthServices.enterOTP(otp);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'OTP verified successfully.',
@@ -54,10 +53,21 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const verify2faOTP = catchAsync(async (req: Request, res: Response) => {
+  const { otp } = req.body;
+  const result = await AuthServices.verify2faOTP(otp);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: result.message,
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   loginUser,
   forgotPassword,
   enterOTP,
+  verify2faOTP,
   resetPassword,
   refreshToken,
 };

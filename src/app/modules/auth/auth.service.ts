@@ -33,7 +33,7 @@ const loginUserFromDB = async (payload: {
     );
   }
   if (userData.twoFactor) {
-    await forgotPassword(userData.email);
+    await twoFactor(userData.email);
     return {
       message: 'OTP sent to the mail successfully. Please check your email.',
     };
@@ -76,7 +76,24 @@ const forgotPassword = async (email: string) => {
   return;
 };
 
-const enterOTP = async (otp: string, type: string | undefined) => {
+const twoFactor = async (email: string) => {
+  const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
+  const user = await prisma.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      twoFactorOTP: randomOtp,
+      twoFactorOTPExpires: otpExpiry,
+    },
+  });
+  await new Email(user).sendPasswordReset(randomOtp);
+
+  return;
+};
+
+const enterOTP = async (otp: string) => {
   const user = await prisma.user.findFirst({
     where: {
       forgotPasswordOTP: otp,
@@ -92,20 +109,40 @@ const enterOTP = async (otp: string, type: string | undefined) => {
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'OTP has expired, please try again resending the OTP.',
+      'OTP has expired, please try resending the OTP again.',
     );
   }
-  if (type === '2fa') {
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        forgotPasswordOTP: null,
-        forgotPasswordOTPExpires: null,
-      },
-    });
+  return;
+};
+
+const verify2faOTP = async (otp: string) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      twoFactorOTP: otp,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Incorrect OTP.');
   }
+  if (
+    user.twoFactorOTPExpires &&
+    user.twoFactorOTPExpires < new Date(Date.now())
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'OTP has expired, please try resending the OTP again.',
+    );
+  }
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      twoFactorOTP: null,
+      twoFactorOTPExpires: null,
+    },
+  });
   const accessToken = await generateToken(
     {
       id: user.id,
@@ -117,7 +154,14 @@ const enterOTP = async (otp: string, type: string | undefined) => {
     config.jwt.access_secret as Secret,
     config.jwt.access_expires_in as string,
   );
-  return accessToken;
+  return {
+    id: user.id,
+    name: user.firstName,
+    email: user.email,
+    role: user.role,
+    accessToken: accessToken,
+    message: 'Logged in successfully.',
+  };
 };
 
 const resetPassword = async (email: string, otp: string, password: string) => {
@@ -181,6 +225,7 @@ export const AuthServices = {
   loginUserFromDB,
   forgotPassword,
   enterOTP,
+  verify2faOTP,
   resetPassword,
   refreshToken,
 };

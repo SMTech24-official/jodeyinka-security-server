@@ -23,6 +23,8 @@ model User {
   avatarUrl                     String?
   password                      String
   twoFactor                     Boolean         @default(false)
+  twoFactorOTP                  String?
+  twoFactorOTPExpires           DateTime?
   emailVerificationToken        String?
   emailVerificationTokenExpires DateTime?
   forgotPasswordOTP             String?
