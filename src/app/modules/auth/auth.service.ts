@@ -88,7 +88,7 @@ const twoFactor = async (email: string) => {
       twoFactorOTPExpires: otpExpiry,
     },
   });
-  await new Email(user).sendPasswordReset(randomOtp);
+  await new Email(user).sendTwoFactorOTP(randomOtp);
 
   return;
 };

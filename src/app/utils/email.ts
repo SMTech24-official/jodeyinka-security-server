@@ -197,7 +197,7 @@ export default class Email {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP - WCF</title>
+    <title>Password Reset OTP - WCF</title>
     <style>
         body {
             margin: 0;
@@ -332,6 +332,183 @@ export default class Email {
         </div>
         <div class="content">
             <h1 class="title">Password Reset Code</h1>
+            <p class="text">Hello,</p>
+            <p class="text">We received a request for an OTP for your WCF account. Use the code below to complete the verification process:</p>
+            
+            <div class="otp-container">
+                <p class="otp-code">${OTP}</p>
+                <p class="otp-expires">This code will expire in 15 minutes</p>
+            </div>
+
+            <div class="security-notice">
+                <p class="text" style="margin: 0;">
+                    <strong>Security Notice:</strong> If you didn't request an OTP, please ignore this email or contact our support team immediately. Someone may be trying to access your account.
+                </p>
+            </div>
+
+            <hr class="divider">
+            
+            <p class="text">For your security:</p>
+            <ul>
+                <li>Never share this code with anyone</li>
+                <li>WCF will never ask you for this code via phone or email</li>
+                <li>Always ensure you're on the official WCF website before entering this code</li>
+            </ul>
+            
+            <p class="text">Need help or have concerns? Contact our support team at <span class="highlight">members@worldcybersecurityforum.org</span></p>
+        </div>
+        <div class="footer">
+            <p class="footer-text">&copy; 2024 WCF. All rights reserved.</p>
+            <p class="footer-text">This is an automated message, please do not reply to this email.</p>
+            <p class="footer-text">Sent by WCF • OTP verification Service</p>
+        </div>
+    </div>
+</body>
+</html>`;
+    await this.send(html, 'WCF OTP');
+  }
+
+  async sendTwoFactorOTP(OTP: string) {
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Factor Verification - WCF</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+        .header {
+            background-color: #000033;
+            padding: 24px;
+            background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Rectangle%207-ZeT2eg7R8OPh1ZUMsJzVmDmh6wBngH.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 51, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .logo {
+            width: 50px;
+            height: auto;
+            margin-right: 15px;
+        }
+        .organization-name {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .content {
+            padding: 48px 24px;
+            background: #ffffff;
+        }
+        .title {
+            color: #000033;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 24px;
+            text-align: center;
+        }
+        .text {
+            color: #333333;
+            font-size: 16px;
+            line-height: 24px;
+            margin: 0 0 24px;
+        }
+        .otp-container {
+            text-align: center;
+            margin: 32px 0;
+            padding: 24px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+        .otp-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #0066FF;
+            margin: 0;
+            padding: 8px 0;
+        }
+        .otp-expires {
+            font-size: 14px;
+            color: #666666;
+            margin: 8px 0 0;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid #e1e1e1;
+            margin: 32px 0;
+        }
+        .security-notice {
+            background-color: #fff8e6;
+            border-left: 4px solid #ffd700;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .footer {
+            background-color: #f8f8f8;
+            padding: 24px;
+            text-align: center;
+        }
+        .footer-text {
+            color: #666666;
+            font-size: 12px;
+            margin: 0 0 12px;
+        }
+        .highlight {
+            color: #0066FF;
+            font-weight: 500;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+            .content {
+                padding: 32px 16px !important;
+            }
+            .otp-code {
+                font-size: 28px;
+            }
+            .organization-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Z3fxIkmDKsU2g2YMHMo0dtHExynWwz.png" alt="WCF Logo" class="logo">
+                    <h2 class="organization-name">World Cybersecurity Forum</h2>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <h1 class="title">Two Factor Authentication</h1>
             <p class="text">Hello,</p>
             <p class="text">We received a request for an OTP for your WCF account. Use the code below to complete the verification process:</p>
             
