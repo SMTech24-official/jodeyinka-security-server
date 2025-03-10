@@ -226,6 +226,7 @@ export const AuthServices = {
   forgotPassword,
   enterOTP,
   verify2faOTP,
+  twoFactor,
   resetPassword,
   refreshToken,
 };

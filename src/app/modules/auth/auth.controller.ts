@@ -63,11 +63,22 @@ const verify2faOTP = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const twoFactor = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const result = await AuthServices.twoFactor(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'OTP sent to the email successfully.',
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   loginUser,
   forgotPassword,
   enterOTP,
   verify2faOTP,
+  twoFactor,
   resetPassword,
   refreshToken,
 };

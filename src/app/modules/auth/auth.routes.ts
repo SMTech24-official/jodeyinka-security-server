@@ -15,6 +15,7 @@ router.get('/refresh-token', auth(), AuthControllers.refreshToken);
 router.post('/forgot-password', AuthControllers.forgotPassword);
 router.post('/enter-otp', AuthControllers.enterOTP);
 router.post('/verify-otp', AuthControllers.verify2faOTP);
+router.post('/resend-otp', AuthControllers.twoFactor);
 router.post('/reset-password', AuthControllers.resetPassword);
 
 export const AuthRouter = router;
