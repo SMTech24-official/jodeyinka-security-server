@@ -116,6 +116,9 @@ const enterOTP = async (otp: string) => {
 };
 
 const verify2faOTP = async (otp: string) => {
+  if (!otp) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'OTP is required.');
+  }
   const user = await prisma.user.findFirstOrThrow({
     where: {
       twoFactorOTP: otp,
