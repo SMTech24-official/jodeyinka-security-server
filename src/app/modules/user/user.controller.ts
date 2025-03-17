@@ -137,7 +137,7 @@ const toggle2fa = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: '2fa status toggled successfully.',
+    message: 'Two factor authentication status updated successfully.',
     data: result,
   });
 });

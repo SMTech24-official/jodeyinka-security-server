@@ -53,18 +53,14 @@ export default class Email {
     //03. Create a transporter and send the mail
     await this.newTransport().sendMail(mailOptions);
   }
-  async sendEmailVerificationLink(
-    // template: string,
-    subject: string,
-    link: string,
-  ) {
+  async sendEmailVerificationLink(subject: string, link: string) {
     //01. Render HTML using the PUG template from the arguments
     const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Your Email - WSF</title>
+    <title>Verify Your Email - WCF</title>
     <style>
         body {
             margin: 0;
@@ -80,15 +76,34 @@ export default class Email {
         }
         .header {
             background-color: #000033;
-            padding: 32px 24px;
-            text-align: center;
+            padding: 24px;
+            background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Rectangle%207-ZeT2eg7R8OPh1ZUMsJzVmDmh6wBngH.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .logo-container {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 51, 0.7);
+            padding: 12px;
+            border-radius: 8px;
         }
         .logo {
-            width: 140px;
+            width: 50px;
             height: auto;
+            margin-right: 15px;
+        }
+        .organization-name {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
         }
         .content {
             padding: 48px 24px;
@@ -153,30 +168,33 @@ export default class Email {
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-container">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%2010-SBHTzfihpSfeUtsH8IHib5Yb1SHW5W.png" alt="WSF Logo" class="logo">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Z3fxIkmDKsU2g2YMHMo0dtHExynWwz.png" alt="WCF Logo" class="logo">
+                    <h2 class="organization-name">World Cybersecurity Forum</h2>
+                </div>
             </div>
         </div>
         <div class="content">
             <h1 class="title">Verify your email address</h1>
-            <p class="text">Welcome to WSF!</p>
+            <p class="text">Welcome to WCF!</p>
             <p class="text">To complete your registration and access all features of your account, please verify your email address by clicking the button below:</p>
             <div class="button-container">
                 <a href="${link}" class="button">Verify Email Address</a>
             </div>
             <p class="text">This verification link will expire in an hour for security reasons.</p>
-            <p class="text">If you didn't create an account with WSF, you can safely ignore this email.</p>
+            <p class="text">If you didn't create an account with WCF, you can safely ignore this email.</p>
             <hr class="divider">
             <p class="text">Need help? Contact our support team at <span class="highlight">members@worldcybersecurityforum.org</span></p>
         </div>
         <div class="footer">
-            <p class="footer-text">&copy; 2024 WSF. All rights reserved.</p>
+            <p class="footer-text">&copy; 2024 WCF. All rights reserved.</p>
             <p class="footer-text">This is an automated message, please do not reply to this email.</p>
         </div>
     </div>
 </body>
-</html>`;
-    //02. Define mail options
+</html>
+`;
     const mailOptions = {
       from: this.from,
       to: this.to,
