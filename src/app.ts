@@ -15,6 +15,7 @@ app.use(
       'http://localhost:5700',
       'https://my-app-nine-tau-26.vercel.app',
       'https://www.worldcybersecurityforum.org',
+      'https://worldcybersecurityforum.org',
     ],
     credentials: true,
   }),
