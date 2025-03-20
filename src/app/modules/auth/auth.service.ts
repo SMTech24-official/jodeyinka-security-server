@@ -122,6 +122,9 @@ const verify2faOTP = async (otp: string) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       twoFactorOTP: otp,
+      twoFactorOTPExpires: {
+        gt: new Date(),
+      },
     },
   });
 
