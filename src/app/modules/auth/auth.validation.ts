@@ -13,5 +13,19 @@ const loginUser = z.object({
     }),
   }),
 });
+const googleLoginUser = z.object({
+  body: z.object({
+    email: z
+      .string({
+        required_error: "Email is required!",
+      })
+      .email({
+        message: "Invalid email format!",
+      }),
+    userFullName: z.string({
+      required_error: "userFullName is required!",
+    }),
+  }),
+});
 
-export const authValidation = { loginUser };
+export const authValidation = { loginUser ,googleLoginUser};

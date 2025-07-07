@@ -12,12 +12,16 @@ const loginUserFromDB = async (payload: {
   email: string;
   password: string;
 }) => {
-  const userData = await prisma.user.findUniqueOrThrow({
+  const userData:any = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
     },
   });
-  const isCorrectPassword: Boolean = await bcrypt.compare(
+
+    if (!userData.password) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password not found');
+  }
+  const isCorrectPassword: any = await bcrypt.compare(
     payload.password,
     userData.password,
   );
@@ -119,7 +123,7 @@ const verify2faOTP = async (otp: string) => {
   if (!otp) {
     throw new AppError(httpStatus.BAD_REQUEST, 'OTP is required.');
   }
-  const user = await prisma.user.findFirstOrThrow({
+  const user:any = await prisma.user.findFirstOrThrow({
     where: {
       twoFactorOTP: otp,
       twoFactorOTPExpires: {
@@ -202,7 +206,7 @@ const resetPassword = async (email: string, otp: string, password: string) => {
 };
 
 const refreshToken = async (userId: string) => {
-  const userData = await prisma.user.findFirst({
+  const userData:any = await prisma.user.findFirst({
     where: {
       id: userId,
     },
@@ -227,6 +231,59 @@ const refreshToken = async (userId: string) => {
   return accessToken;
 };
 
+
+
+
+
+const googleLoginUserFromDB = async (payload: {
+  email: string;
+  userFullName: string;
+}) => {
+  // user টাইপ ঠিকভাবে দাও (যদি না পারো তাহলে any রাখা যাবে, তবে preferred নয়)
+  let user: any = await prisma.user.findFirst({
+    where: {
+      email: payload.email,
+    },
+  });
+
+  // যদি user না থাকে, তাহলে create করো
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: payload.email,
+        userFullName: payload.userFullName,
+        isEmailVerified: true,
+        sponsorStatus:"PENDING"
+      },
+    });
+  }
+
+ 
+  // Token generate করো
+  const accessToken = await generateToken(
+    {
+      id: user.id,
+      name: user.userFullName,
+      email: user.email,
+      role: user.role,
+      sponsorStatus: user.sponsorStatus,
+    },
+    config.jwt.access_secret as Secret,
+    config.jwt.access_expires_in as string
+  );
+
+  // Return final response
+  return {
+    id: user.id,
+    name: user.userFullName,
+    email: user.email,
+    role: user.role,
+    accessToken: accessToken,
+    message: 'Logged in successfully.',
+  };
+};
+
+
 export const AuthServices = {
   loginUserFromDB,
   forgotPassword,
@@ -235,4 +292,5 @@ export const AuthServices = {
   twoFactor,
   resetPassword,
   refreshToken,
+  googleLoginUserFromDB
 };

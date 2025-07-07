@@ -12,16 +12,17 @@ datasource db {
 
 model User {
   id                            String          @id @default(auto()) @map("_id") @db.ObjectId
-  firstName                     String
-  lastName                      String
+  firstName                     String?
+  lastName                      String?
   userName                      String?
+  userFullName                  String?
   organizationName              String?
   email                         String          @unique
-  country                       String
+  country                       String?
   state                         String?
   address                       String?
   avatarUrl                     String?
-  password                      String
+  password                      String?
   twoFactor                     Boolean         @default(false)
   twoFactorOTP                  String?
   twoFactorOTPExpires           DateTime?
@@ -29,7 +30,8 @@ model User {
   emailVerificationTokenExpires DateTime?
   forgotPasswordOTP             String?
   forgotPasswordOTPExpires      DateTime?
-  dob                           DateTime
+  dob                           DateTime?
+  number                        String?
   isEmailVerified               Boolean         @default(false)
   sponsorStatus                 SponsorStatus   @default(NONE)
   role                          UserRoleEnum    @default(USER)

@@ -12,6 +12,14 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const googleLoginUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.googleLoginUserFromDB(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: result.message,
+    data: result,
+  });
+});
 
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -81,4 +89,5 @@ export const AuthControllers = {
   twoFactor,
   resetPassword,
   refreshToken,
+  googleLoginUser
 };

@@ -10,6 +10,11 @@ router.post(
   validateRequest(authValidation.loginUser),
   AuthControllers.loginUser,
 );
+router.post(
+  '/googleLogin',
+  validateRequest(authValidation.googleLoginUser),
+  AuthControllers.googleLoginUser,
+);
 
 router.get('/refresh-token', auth(), AuthControllers.refreshToken);
 router.post('/forgot-password', AuthControllers.forgotPassword);
