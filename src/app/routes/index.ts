@@ -11,6 +11,7 @@ import { transactionRouter } from '../modules/transaction/transaction.route';
 import { eventUsersRouter } from '../modules/eventUsers/eventUsers.route';
 import { notificationRouter } from '../modules/notification/notification.route';
 import { stripeRoute } from '../modules/stripe/stripe.route';
+import { followRouter } from '../modules/follow/follow.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -57,6 +58,14 @@ const moduleRoutes = [
   {
     path: '/notification',
     route: notificationRouter,
+  },
+  {
+    path: '/notification',
+    route: notificationRouter,
+  },
+  {
+    path: '/follow',
+    route: followRouter,
   },
 ];
 

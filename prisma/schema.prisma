@@ -47,6 +47,15 @@ model User {
   EventsUser                    EventsUser[]
 
   @@map("users")
+  GroupMessage GroupMessage[]
+  GroupMember GroupMember[]
+  Group Group[]
+  callsMade      Call[] @relation("Receiver")
+  callsReceived  Call[] @relation("Caller")
+  Follows Follow[] @relation("UserFollows")
+  Followers Follow[] @relation("UserFollowers")
+  sentMessages      Message[] @relation("SentMessages")
+  receivedMessages  Message[] @relation("ReceivedMessages")
 }
 
 model Resource {
@@ -149,6 +158,116 @@ model Transaction {
 
   @@map("transactions")
 }
+
+
+model Follow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String   @db.ObjectId
+  follower    User     @relation("UserFollows", fields: [followerId], references: [id])
+  followingId String   @db.ObjectId
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String   @db.ObjectId
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  content    String?
+  messageType MessageType @default(TEXT)  // TEXT, IMAGE, AUDIO, VIDEO ইত্যাদি
+  createdAt  DateTime @default(now())
+
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+}
+
+model Call {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  callerId     String    @db.ObjectId
+  caller       User      @relation("Caller", fields: [callerId], references: [id])
+  receiverId   String    @db.ObjectId
+  receiver     User      @relation("Receiver", fields: [receiverId], references: [id])
+  callType     CallType
+  startedAt    DateTime
+  endedAt      DateTime?
+  status       CallStatus
+  createdAt    DateTime  @default(now())
+
+  @@map("calls")
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallStatus {
+  MISSED
+  COMPLETED
+  CANCELLED
+  ONGOING
+}
+
+
+model Group {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  creatorId   String         @db.ObjectId
+  creator     User           @relation(fields: [creatorId], references: [id])
+  createdAt   DateTime       @default(now())
+  members     GroupMember[]
+
+  @@map("groups")
+  GroupMessage GroupMessage[]
+}
+
+
+model GroupMember {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String   @db.ObjectId
+  group     Group    @relation(fields: [groupId], references: [id])
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  role      GroupMemberRole  @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  @@unique([groupId, userId])
+  @@map("group_members")
+}
+
+enum GroupMemberRole {
+  ADMIN
+  MEMBER
+}
+
+
+
+
+model GroupMessage {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String    @db.ObjectId
+  group     Group     @relation(fields: [groupId], references: [id])
+  senderId  String    @db.ObjectId
+  sender    User      @relation(fields: [senderId], references: [id])
+  content   String?
+  messageType MessageType @default(TEXT)
+  createdAt DateTime  @default(now())
+
+  @@map("group_messages")
+}
+
 
 enum UserRoleEnum {
   USER
