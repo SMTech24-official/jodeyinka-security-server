@@ -10,6 +10,7 @@ import { resourceRouter } from '../modules/resource/resource.route';
 import { transactionRouter } from '../modules/transaction/transaction.route';
 import { eventUsersRouter } from '../modules/eventUsers/eventUsers.route';
 import { notificationRouter } from '../modules/notification/notification.route';
+import { stripeRoute } from '../modules/stripe/stripe.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -28,6 +29,10 @@ const moduleRoutes = [
   {
     path: '/paypal',
     route: paypalRouter,
+  },
+  {
+    path: '/stripe',
+    route: stripeRoute,
   },
   {
     path: '/contact',

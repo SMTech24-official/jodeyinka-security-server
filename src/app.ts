@@ -4,6 +4,7 @@ import httpStatus from 'http-status';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import router from './app/routes';
 import { gRecaptchaController } from './app/modules/gRecaptcha/gRecaptcha.controller';
+import { stripeWebhookHandler } from './app/modules/stripe/stripeWebhook';
 
 const app: Application = express();
 app.use(
@@ -20,7 +21,11 @@ app.use(
     credentials: true,
   }),
 );
-
+app.post(
+  "/api/v1/webhook",
+  express.raw({ type: "application/json" }), // stripe expects raw body
+  stripeWebhookHandler
+);
 //parser
 app.use(express.json({ limit: '5000mb' }));
 app.use(express.urlencoded({ limit: '5000mb', extended: true }));
