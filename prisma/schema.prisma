@@ -56,6 +56,10 @@ model User {
   Followers Follow[] @relation("UserFollowers")
   sentMessages      Message[] @relation("SentMessages")
   receivedMessages  Message[] @relation("ReceivedMessages")
+  
+ 
+  Favourite Favourite[] @relation("UserFavourites")
+  UserIsFavourited Favourite[] @relation("UserIsFavourited")
 }
 
 model Resource {
@@ -267,6 +271,21 @@ model GroupMessage {
 
   @@map("group_messages")
 }
+
+
+model Favourite {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId           String   @db.ObjectId
+  user             User     @relation("UserFavourites", fields: [userId], references: [id], onDelete: Cascade)
+
+  favouriteUserId  String   @db.ObjectId
+  favouriteUser    User     @relation("UserIsFavourited", fields: [favouriteUserId], references: [id], onDelete: Cascade)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 
 
 enum UserRoleEnum {

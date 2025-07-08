@@ -12,6 +12,8 @@ import { eventUsersRouter } from '../modules/eventUsers/eventUsers.route';
 import { notificationRouter } from '../modules/notification/notification.route';
 import { stripeRoute } from '../modules/stripe/stripe.route';
 import { followRouter } from '../modules/follow/follow.route';
+import { streamRoutes } from '../modules/stream/stream.route';
+import { favouriteRouters } from '../modules/favourite/favourite.routes';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -67,6 +69,15 @@ const moduleRoutes = [
     path: '/follow',
     route: followRouter,
   },
+  {
+    path: '/stream',
+    route: streamRoutes,
+  },
+  {
+    path: '/favourite',
+    route: favouriteRouters,
+  },
+  
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.route));
