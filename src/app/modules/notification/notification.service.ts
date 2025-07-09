@@ -45,8 +45,18 @@ const getMyNotification = async (id: string) => {
 
 const createNotification = async (payload:any) => {
 
-  return  await prisma.notifications.create({data:payload})
-  
+  const notifications=  await prisma.notifications.create({data:payload})
+
+  if(notifications?.id){
+   
+    return  await prisma.notifications.findFirst({where:{id:notifications.id},   include: {
+      sender: true, 
+      receiver: true, 
+    }})
+
+
+  }
+  return
  
 };
 
