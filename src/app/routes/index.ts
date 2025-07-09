@@ -61,10 +61,10 @@ const moduleRoutes = [
     path: '/notification',
     route: notificationRouter,
   },
-  {
-    path: '/notification',
-    route: notificationRouter,
-  },
+  // {
+  //   path: '/notification',
+  //   route: notificationRouter,
+  // },
   {
     path: '/follow',
     route: followRouter,

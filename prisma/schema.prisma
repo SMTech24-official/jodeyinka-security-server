@@ -41,7 +41,6 @@ model User {
   Resources                     Resource[]
   Comment                       Comment[]
   Event                         Event[]
-  Notifications                 Notifications[]
   Transaction                   Transaction[]
   EventSponsor                  EventSponsor[]
   EventsUser                    EventsUser[]
@@ -60,6 +59,8 @@ model User {
  
   Favourite Favourite[] @relation("UserFavourites")
   UserIsFavourited Favourite[] @relation("UserIsFavourited")
+  receiverNotifications Notifications[] @relation("receiver")
+  senderNotifications Notifications[] @relation("sender")
 }
 
 model Resource {
@@ -141,9 +142,13 @@ model EventsUser {
 model Notifications {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   receiverId  String?  @db.ObjectId
-  receiver    User?    @relation(fields: [receiverId], references: [id])
-  title       String
-  description String
+  receiver    User?    @relation("receiver",fields: [receiverId], references: [id])
+  senderId   String?  @db.ObjectId
+  sender      User?    @relation("sender",fields: [receiverId], references: [id])
+  title       String?
+  description String?
+  message      String?
+  type           String?
   createdAt   DateTime @default(now())
 
   @@map("notifications")

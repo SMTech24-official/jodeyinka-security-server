@@ -9,6 +9,7 @@ router
   .get(eventControllers.getUpcomingEvents)
   .post(auth(), s3Multer.single('eventImage'), eventControllers.createEvent);
 router.route('/upcoming').get(eventControllers.getUpcomingEvents);
+router.route('/all').get(eventControllers.getAllEvents);
 router.get('/:eventId', auth(), eventControllers.getSingleEvent);
 
 export const eventRouter = router;

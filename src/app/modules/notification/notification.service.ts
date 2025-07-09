@@ -14,8 +14,8 @@ const getNotifications = async () => {
       createdAt: true,
     },
   });
-  const birthdayNotifications = users.filter(user => {
-    const userDob = new Date(user.dob);
+  const birthdayNotifications = users.filter((user:any) => {
+    const userDob = new Date(user?.dob);
     const userDay = userDob.getUTCDate();
     const userMonth = userDob.getUTCMonth();
     return userDay === day && userMonth === month;
@@ -30,6 +30,28 @@ const getNotifications = async () => {
   return { birthdayNotifications, memberAnniversaryNotifications };
 };
 
+const getMyNotification = async (id: string) => {
+  return await prisma.notifications.findMany({
+    where: { receiverId: id },
+    include: {
+      sender: true, 
+      receiver: true, 
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+const createNotification = async (payload:any) => {
+
+  return  await prisma.notifications.create({data:payload})
+  
+ 
+};
+
 export const notificationServices = {
   getNotifications,
+  createNotification,
+  getMyNotification
 };

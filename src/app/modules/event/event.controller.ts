@@ -40,6 +40,19 @@ const getUpcomingEvents = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getAllEvents = catchAsync(async (req: Request, res: Response) => {
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const result =
+    await eventServices.getAllEvents( req?.query?.srearchParamas, paginationOptions);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'all events retrieved successfully.',
+    data: result,
+  });
+});
+
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
   const { eventId } = req.params;
   const userId = req.user.id;
@@ -55,4 +68,5 @@ export const eventControllers = {
   createEvent,
   getUpcomingEvents,
   getSingleEvent,
+  getAllEvents
 };

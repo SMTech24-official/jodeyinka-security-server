@@ -44,6 +44,25 @@ const getUpcomingEvents = async (paginationOptions: IPaginationOptions) => {
   });
   return events;
 };
+
+const getAllEvents = async (searchParams: string|any, paginationOptions: IPaginationOptions) => {
+  const { limit, skip } = paginationHelpers.calculatePagination(paginationOptions);
+
+  const events = await prisma.event.findMany({
+    where: {
+      title: {
+        contains: searchParams, // partial match
+        mode: "insensitive",    // case-insensitive search (optional)
+      },
+    },
+    skip,
+    take: limit,
+  });
+
+  return events;
+  
+};
+
 const getSingleEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findFirst({
     where: {
@@ -76,4 +95,5 @@ export const eventServices = {
   createEvent,
   getUpcomingEvents,
   getSingleEvent,
+  getAllEvents
 };

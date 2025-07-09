@@ -14,6 +14,18 @@ const getNotifications = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyNotification = catchAsync(async (req: Request, res: Response) => {
+  const notifications = await notificationServices.getMyNotification(req?.params?.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'my Notifications retrieved successfully.',
+    data: notifications,
+  });
+});
+
+
 export const notificationControllers = {
   getNotifications,
+  getMyNotification
 };
