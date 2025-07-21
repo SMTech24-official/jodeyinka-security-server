@@ -11,8 +11,8 @@ interface UserWithOptionalPassword extends Omit<User, 'password'> {
   password?: string;
 }
 
-const registerUserIntoDB = async (payload: User) => {
-  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
+const registerUserIntoDB = async (payload: User|any) => {
+  const hashedPassword: string = await bcrypt.hash(payload?.password, 12);
   const userData = {
     ...payload,
     password: hashedPassword,
@@ -98,7 +98,7 @@ const updateUserRoleStatusIntoDB = async (id: string, payload: any) => {
 };
 
 const changePassword = async (userId: string, payload: any) => {
-  const userData = await prisma.user.findUniqueOrThrow({
+  const userData:any = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,
       status: 'ACTIVE',
