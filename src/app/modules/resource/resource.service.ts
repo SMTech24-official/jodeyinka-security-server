@@ -49,6 +49,38 @@ const getResources = async (
   return resources;
 };
 
+const getResourcesForMobile = async (
+
+  paginationOptions: IPaginationOptions,
+  searchparam: string,
+) => {
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
+  const resources = await prisma.resource.findMany({
+    where: {
+      OR: [
+        { title: { contains: searchparam, mode: 'insensitive' } },
+        { description: { contains: searchparam, mode: 'insensitive' } },
+
+      ],
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      Author: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+  return resources;
+};
+
 const getUserResources = async (
   userId: string,
   type: string,
@@ -213,4 +245,5 @@ export const resourceServices = {
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,
+  getResourcesForMobile
 };

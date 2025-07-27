@@ -46,6 +46,24 @@ const getResources = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getResourcesForMobile = catchAsync(async (req: Request, res: Response) => {
+  const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
+  const searchparam = (req.query?.searchparam as string) || '';
+
+  const resources = await resourceServices.getResourcesForMobile(
+    paginationOptions, // ✅ Correct order
+    searchparam,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Resources retrieved successfully.',
+    data: resources,
+  });
+});
+
 const getUserResources = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
   const { type } = req.params;
@@ -151,4 +169,5 @@ export const resourceControllers = {
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,
+  getResourcesForMobile
 };

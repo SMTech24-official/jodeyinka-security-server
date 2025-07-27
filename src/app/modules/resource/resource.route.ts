@@ -16,6 +16,11 @@ router
   .route('/user/type/:type')
   .get(auth(), resourceControllers.getUserResources);
 
+
+router.route('/mobile')
+  .get( resourceControllers.getResourcesForMobile);
+
+
 router.route('/trending').get(auth(), resourceControllers.getTrendingResources);
 router
   .route('/:resourceId')

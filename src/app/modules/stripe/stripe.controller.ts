@@ -5,20 +5,13 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.id; // Authenticated user থেকে id নিতে হবে (middleware থেকে)
+  const userId = req.user?.id;
   const { priceId, type } = req.body;
 
-  if (!userId) {
-    return res.status(httpStatus.UNAUTHORIZED).json({
-      success: false,
-      message: 'User not authenticated',
-    });
-  }
-
-  if (!priceId || !type) {
+  if (!userId || !priceId || !type) {
     return res.status(httpStatus.BAD_REQUEST).json({
       success: false,
-      message: 'priceId and type are required',
+      message: 'userId, priceId and type are required',
     });
   }
 
@@ -32,6 +25,26 @@ const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const cancelUserSubscription = catchAsync(async (req: Request, res: Response) => {
+  const { checkoutSessionId } = req.body;
+
+  if (!checkoutSessionId) {
+    return res.status(httpStatus.BAD_REQUEST).json({
+      success: false,
+      message: 'checkoutSessionId is required',
+    });
+  }
+
+  const result = await stripeService.cancelSubscription(checkoutSessionId);
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: 'Subscription cancelled successfully',
+    data: result,
+  });
+});
+
 export const stripeController = {
   createPaymentSession,
+  cancelUserSubscription,
 };
