@@ -61,6 +61,10 @@ model User {
   UserIsFavourited Favourite[] @relation("UserIsFavourited")
   receiverNotifications Notifications[] @relation("receiver")
   senderNotifications Notifications[] @relation("sender")
+  
+  JobApply JobApply[] @relation("UserApplications")
+  Job Job[] @relation("UserJobs")
+  Like Like[]
 }
 
 model Resource {
@@ -76,7 +80,51 @@ model Resource {
   Comments    Comment[]
 
   @@map("resources")
+  Like Like[]
 }
+
+enum SalaryType {
+  HOURLY
+  MONTHLY
+  YEARLY
+}
+
+
+
+model Job {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  company     String
+  location    String
+  salary      Int
+  salaryType  SalaryType
+
+  authorId    String       @db.ObjectId
+  Author      User         @relation("UserJobs", fields: [authorId], references: [id])
+
+  applications JobApply[]  @relation("JobApplications")
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("job")
+}
+
+model JobApply {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+
+  jobId        String     @db.ObjectId
+  applicantId  String     @db.ObjectId
+
+  Job          Job        @relation("JobApplications", fields: [jobId], references: [id])
+  Applicant    User       @relation("UserApplications", fields: [applicantId], references: [id])
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("jobApply")
+}
+
 
 model Comment {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -89,6 +137,21 @@ model Comment {
 
   @@map("comments")
 }
+
+model Like {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  resourceId String   @db.ObjectId
+  Resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  userId     String   @db.ObjectId
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([resourceId, userId]) // একজন user একবারই like করতে পারবে
+  @@map("likes")
+}
+
 
 model EventSponsor {
   id        String           @id @default(auto()) @map("_id") @db.ObjectId

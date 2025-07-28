@@ -14,6 +14,8 @@ import { stripeRoute } from '../modules/stripe/stripe.route';
 import { followRouter } from '../modules/follow/follow.route';
 import { streamRoutes } from '../modules/stream/stream.route';
 import { favouriteRouters } from '../modules/favourite/favourite.routes';
+import { JobRoutes } from '../modules/job/job.route';
+import { LikeRoutes } from '../modules/like/like.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -76,6 +78,14 @@ const moduleRoutes = [
   {
     path: '/favourite',
     route: favouriteRouters,
+  },
+  {
+    path: '/job',
+    route: JobRoutes,
+  },
+  {
+    path: '/like',
+    route: LikeRoutes,
   },
   
 ];

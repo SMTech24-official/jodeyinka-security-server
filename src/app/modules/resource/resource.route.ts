@@ -17,7 +17,7 @@ router
   .get(auth(), resourceControllers.getUserResources);
 
 
-router.route('/mobile')
+router.route('/mobile/resource')
   .get( resourceControllers.getResourcesForMobile);
 
 

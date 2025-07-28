@@ -1,0 +1,135 @@
+import prisma from '../../utils/prisma';
+import { IPaginationOptions } from '../../interface/pagination.type';
+import { paginationHelpers } from '../../helpers/paginationHelper';
+
+const createJob = async (data: {
+  title: string;
+  company: string;
+  location: string;
+  salary: number;
+  salaryType: 'HOURLY' | 'MONTHLY' | 'YEARLY';
+  authorId: string;
+}) => {
+  const job = await prisma.job.create({
+    data,
+  });
+  return job;
+};
+
+const getAllJobs = async (
+  paginationOptions: IPaginationOptions,
+  searchParams?: string
+) => {
+  const { limit, skip } =
+    paginationHelpers.calculatePagination(paginationOptions);
+
+  const orConditions = [];
+
+  if (searchParams) {
+    orConditions.push(
+      { title: { contains: searchParams, mode: 'insensitive' } },
+      { company: { contains: searchParams, mode: 'insensitive' } },
+      { location: { contains: searchParams, mode: 'insensitive' } }
+    );
+  }
+
+  const whereCondition:any = orConditions.length > 0 ? { OR: orConditions } : {};
+
+  const jobs = await prisma.job.findMany({
+    where: whereCondition,
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      Author: true,
+      applications:true
+    },
+  });
+
+  const total = await prisma.job.count({ where: whereCondition });
+
+  return {
+    meta: {
+      total,
+      limit,
+      page: paginationOptions.page,
+    },
+    data: jobs,
+  };
+};
+
+const getSingleJobById = async (jobId: string) => {
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    include: {
+      Author: true,
+    },
+  });
+
+  return job;
+};
+
+const applyToJob = async (userId: string, jobId: string) => {
+  const existing = await prisma.jobApply.findFirst({
+    where: {
+      applicantId: userId,
+      jobId,
+    },
+  });
+
+  if (existing) {
+    // Already applied → Remove application (withdraw)
+    await prisma.jobApply.delete({
+      where: {
+        id: existing.id,
+      },
+    });
+
+    return {
+      message: 'Application withdrawn successfully.',
+      action: 'withdrawn',
+    };
+  }
+
+  // Not applied yet → Apply now
+  const application = await prisma.jobApply.create({
+    data: {
+      applicantId: userId,
+      jobId,
+    },
+  });
+
+  return {
+    message: 'Applied to job successfully.',
+    action: 'applied',
+    data: application,
+  };
+};
+
+
+const getAppliedJobsByUser = async (userId: string) => {
+  const applications = await prisma.jobApply.findMany({
+    where: {
+      applicantId: userId,
+    },
+    include: {
+      Job: {
+        include: {
+          Author: true,
+        },
+      },
+    },
+  });
+
+  return applications;
+};
+
+export const JobService = {
+  createJob,
+  getAllJobs,
+  getSingleJobById,
+  applyToJob,
+  getAppliedJobsByUser,
+};
