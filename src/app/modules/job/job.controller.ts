@@ -53,9 +53,9 @@ const getSingleJob = catchAsync(async (req: Request, res: Response) => {
 // Apply to a Job
 const applyToJob = catchAsync(async (req: Request, res: Response) => {
   
-  const { jobId } = req.params;
 
-  const {userId} = req.body
+
+  const {userId,jobId} = req.body
 
   const result = await JobService.applyToJob(userId, jobId);
 

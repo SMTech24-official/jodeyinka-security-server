@@ -46,16 +46,26 @@ const likeResourceOwner = async (userId: string) => {
       
     },
     include:{
-      Resource:{include:{Author:{select:{firstName:true,lastName:true,id:true,userName:true,organizationName:true,email:true}}}}
+      Resource:{include:{Author:{select:{firstName:true,lastName:true,id:true,userName:true,organizationName:true,email:true,avatarUrl:true,Followers:true}}}}
     }
   });
 
+  const uniqueAuthorsMap = new Map();
+
+result.forEach((item) => {
+  const author = item?.Resource?.Author;
+  if (author && !uniqueAuthorsMap.has(author.id)) {
+    uniqueAuthorsMap.set(author.id, author);
+  }
+});
+
+const uniqueAuthors = Array.from(uniqueAuthorsMap.values());
 
 
   return {
     message: 'Liked successfully',
     liked: true,
-    data: result,
+    data: uniqueAuthors,
   };
 };
 
