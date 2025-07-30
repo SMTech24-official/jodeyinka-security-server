@@ -39,36 +39,99 @@ const toggleLike = async (userId: string, resourceId: string) => {
 
 
 
+// const likeResourceOwner = async (userId: string) => {
+//   const result = await prisma.like.findMany({
+//     where: {
+//       userId,
+      
+//     },
+//     include:{
+//       Resource:{include:{Author:{select:{firstName:true,lastName:true,id:true,userName:true,organizationName:true,email:true,avatarUrl:true,Followers:true}}}}
+//     }
+//   });
+
+//   const uniqueAuthorsMap = new Map();
+
+// result.forEach((item) => {
+//   const author = item?.Resource?.Author;
+//   if (author && !uniqueAuthorsMap.has(author.id)) {
+//     uniqueAuthorsMap.set(author.id, author);
+//   }
+// });
+
+// const uniqueAuthors = Array.from(uniqueAuthorsMap.values());
+
+
+//   return {
+//     message: 'Liked successfully',
+//     liked: true,
+//     data: uniqueAuthors,
+//   };
+// };
+
+
 const likeResourceOwner = async (userId: string) => {
+
+  
   const result = await prisma.like.findMany({
     where: {
       userId,
-      
     },
-    include:{
-      Resource:{include:{Author:{select:{firstName:true,lastName:true,id:true,userName:true,organizationName:true,email:true,avatarUrl:true,Followers:true}}}}
-    }
+    include: {
+      Resource: {
+        include: {
+          Author: {
+            select: {
+              firstName: true,
+              lastName: true,
+              id: true,
+              userName: true,
+              organizationName: true,
+              email: true,
+              avatarUrl: true,
+              Followers: {
+                select: {
+                  id: true,
+                  followerId: true,
+                  followingId: true,
+                  createdAt: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   const uniqueAuthorsMap = new Map();
 
-result.forEach((item) => {
-  const author = item?.Resource?.Author;
-  if (author && !uniqueAuthorsMap.has(author.id)) {
-    uniqueAuthorsMap.set(author.id, author);
-  }
-});
+  result.forEach((item) => {
+    const author = item?.Resource?.Author;
+    if (author && !uniqueAuthorsMap.has(author?.id)) {
+      uniqueAuthorsMap.set(author?.id, author);
+    }
+  });
 
-const uniqueAuthors = Array.from(uniqueAuthorsMap.values());
+  const uniqueAuthors = Array.from(uniqueAuthorsMap.values());
 
+  const finalAuthors = uniqueAuthors.map((author) => {
+    const isFollow = author?.Followers?.some(
+      (follower:any) => follower?.followerId === userId
+    );
+
+    return {
+      ...author,
+      isFollow,
+    };
+  });
 
   return {
     message: 'Liked successfully',
     liked: true,
-    data: uniqueAuthors,
+    data: finalAuthors,
   };
 };
-
 
 
 
