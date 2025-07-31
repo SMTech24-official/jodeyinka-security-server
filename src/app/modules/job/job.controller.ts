@@ -22,17 +22,21 @@ const createJob = catchAsync(async (req: Request, res: Response) => {
 
 // Get All Jobs (with pagination)
 const getAllJobs = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.query.userId as string | undefined;
+
+  // req.query থেকে userId মুছে ফেলা হচ্ছে
+  delete req.query.userId;
+
   const paginationOptions = pickValidFields(req.query, ['limit', 'page']);
   const searchParams = req.query.searchParams as string | undefined;
 
-  const result = await JobService.getAllJobs(paginationOptions, searchParams);
+  const result = await JobService.getAllJobs(paginationOptions, searchParams, userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Jobs retrieved successfully.',
     data: result.data,
-  
   });
 });
 
@@ -62,7 +66,7 @@ const applyToJob = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Applied to job successfully.',
+    message: result.message,
     data: result,
   });
 });

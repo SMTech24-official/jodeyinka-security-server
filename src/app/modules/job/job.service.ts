@@ -16,12 +16,56 @@ const createJob = async (data: {
   return job;
 };
 
+// const getAllJobs = async (
+//   paginationOptions: IPaginationOptions,
+//   searchParams?: string
+// ) => {
+//   const { limit, skip } =
+//     paginationHelpers.calculatePagination(paginationOptions);
+
+//   const orConditions = [];
+
+//   if (searchParams) {
+//     orConditions.push(
+//       { title: { contains: searchParams, mode: 'insensitive' } },
+//       { company: { contains: searchParams, mode: 'insensitive' } },
+//       { location: { contains: searchParams, mode: 'insensitive' } }
+//     );
+//   }
+
+//   const whereCondition:any = orConditions.length > 0 ? { OR: orConditions } : {};
+
+//   const jobs = await prisma.job.findMany({
+//     where: whereCondition,
+//     skip,
+//     take: limit,
+//     orderBy: {
+//       createdAt: 'desc',
+//     },
+//     include: {
+//       Author: true,
+//       applications:true
+//     },
+//   });
+
+//   const total = await prisma.job.count({ where: whereCondition });
+
+//   return {
+//     meta: {
+//       total,
+//       limit,
+//       page: paginationOptions.page,
+//     },
+//     data: jobs,
+//   };
+// };
+
 const getAllJobs = async (
   paginationOptions: IPaginationOptions,
-  searchParams?: string
+  searchParams?: string,
+  userId?: string // ইউজারের আইডি, যাকে দেখে চেক করবে আবেদন করেছে কিনা
 ) => {
-  const { limit, skip } =
-    paginationHelpers.calculatePagination(paginationOptions);
+  const { limit, skip } = paginationHelpers.calculatePagination(paginationOptions);
 
   const orConditions = [];
 
@@ -33,8 +77,9 @@ const getAllJobs = async (
     );
   }
 
-  const whereCondition:any = orConditions.length > 0 ? { OR: orConditions } : {};
+  const whereCondition: any = orConditions.length > 0 ? { OR: orConditions } : {};
 
+  // ডাটাবেজ থেকে চাকরি ও আবেদনকারীদের সাথে নিয়ে আসা
   const jobs = await prisma.job.findMany({
     where: whereCondition,
     skip,
@@ -44,11 +89,25 @@ const getAllJobs = async (
     },
     include: {
       Author: true,
-      applications:true
+      applications: {
+        select: {
+          applicantId: true, // applicantId টা নিয়ে আসছি
+        },
+      },
     },
   });
 
   const total = await prisma.job.count({ where: whereCondition });
+
+  // প্রতিটি job এর জন্য চেক করবো userId এর সঙ্গে match করে কিনা আবেদন আছে
+  const modifiedJobs = jobs.map((job) => {
+    const isJobApplied = job.applications.some(app => app.applicantId === userId);
+    return {
+      isJobApplied,
+      ...job,
+      
+    };
+  });
 
   return {
     meta: {
@@ -56,9 +115,10 @@ const getAllJobs = async (
       limit,
       page: paginationOptions.page,
     },
-    data: jobs,
+    data: modifiedJobs,
   };
 };
+
 
 const getSingleJobById = async (jobId: string) => {
   const job = await prisma.job.findUnique({

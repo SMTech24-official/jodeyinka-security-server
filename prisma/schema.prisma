@@ -23,6 +23,9 @@ model User {
   address                       String?
   avatarUrl                     String?
   password                      String?
+  image                          String?
+  isOnline                       Boolean?  @default(false)
+  lastSeen                      DateTime?
   twoFactor                     Boolean?         @default(false)
   twoFactorOTP                  String?
   twoFactorOTPExpires           DateTime?
@@ -59,12 +62,14 @@ model User {
  
   Favourite Favourite[] @relation("UserFavourites")
   UserIsFavourited Favourite[] @relation("UserIsFavourited")
-  receiverNotifications Notifications[] @relation("receiver")
-  senderNotifications Notifications[] @relation("sender")
+  
   
   JobApply JobApply[] @relation("UserApplications")
   Job Job[] @relation("UserJobs")
   Like Like[]
+
+  NotificationSender Notifications[] @relation("NotificationSender")
+  NotificationReceiver Notifications[] @relation("NotificationReceiver")
 }
 
 model Resource {
@@ -202,16 +207,35 @@ model EventsUser {
   @@map("events_user")
 }
 
+model Message {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String   @db.ObjectId
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  content    String?
+  seen       Boolean?   @default(false)
+  seenAt     DateTime?
+  roomId      String  
+  createdAt  DateTime @default(now())
+
+  @@map("messages")
+}
+
+
 model Notifications {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+
   receiverId  String?  @db.ObjectId
-  receiver    User?    @relation("receiver",fields: [receiverId], references: [id])
-  senderId   String?  @db.ObjectId
-  sender      User?    @relation("sender",fields: [receiverId], references: [id])
+  receiver    User?    @relation("NotificationReceiver", fields: [receiverId], references: [id])
+
+  senderId    String?  @db.ObjectId
+  sender      User?    @relation("NotificationSender", fields: [senderId], references: [id])
+
   title       String?
   description String?
-  message      String?
-  type           String?
+  message     String?
+  type        String?
   createdAt   DateTime @default(now())
 
   @@map("notifications")
@@ -252,18 +276,7 @@ model Follow {
   @@map("follows")
 }
 
-model Message {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  senderId   String   @db.ObjectId
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiverId String   @db.ObjectId
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
-  content    String?
-  messageType MessageType @default(TEXT)  // TEXT, IMAGE, AUDIO, VIDEO ইত্যাদি
-  createdAt  DateTime @default(now())
 
-  @@map("messages")
-}
 
 enum MessageType {
   TEXT

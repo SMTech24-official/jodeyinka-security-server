@@ -40,13 +40,16 @@ import { Server as SocketIOServer } from "socket.io";
 import app from "./app";
 import config from "./config";
 import seedSuperAdmin from "./app/DB";
-import { notificationServices } from "./app/modules/notification/notification.service";
+import { setIOInstance } from "./app/utils/socket";
+import { handleSocketEvents } from "./app/modules/socket/socketHandler";
+
 
 
 const port = config.port || 5000;
 
 async function main() {
   const httpServer = createServer(app);
+      seedSuperAdmin();
 
   // Initialize Socket.IO
   const io = new SocketIOServer(httpServer, {
@@ -67,49 +70,19 @@ async function main() {
     },
   });
 
-  // Socket.IO Events
-  io.on("connection", (socket) => {
-    console.log("✅ User connected:", socket.id);
+ 
 
-    socket.on("register_user", (userId: string) => {
-      socket.join(userId);
-      console.log("📌 Joined room:", userId);
-    });
+  setIOInstance(io);
 
-    // When message sent from frontend client
-    socket.on("send_message_notification", async (data) => {
-      const {
-        senderId,
-        receiverId,
-      
-       
-        type = "message",
-        message,
-      } = data;
+  io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
 
-      try {
-        const notification = await notificationServices.createNotification({
-          senderId,
-          receiverId,
-          type,
-          message,
-        });
+    handleSocketEvents(io, socket);
 
-        // Emit to receiver room
-        if (receiverId) {
-          io.to(receiverId).emit("receive_notification", notification);
-          console.log("🔔 Notification sent to", receiverId);
-        }
-      } catch (err) {
-        console.error("❌ Notification creation failed:", err);
-      }
-    });
-
-    socket.on("disconnect", () => {
-      console.log("❌ Disconnected:", socket.id);
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
     });
   });
-
   // Start HTTP Server
   httpServer.listen(port, () => {
     console.log(`🚀 Server is running on port ${port}`);
