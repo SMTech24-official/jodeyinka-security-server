@@ -10,6 +10,7 @@ const createPaymentSession = async (
   userId: string,
   type: string
 ) => {
+  console.log("createPaymentSession")
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
