@@ -24,8 +24,8 @@ const createPaymentSession = async (
       userId,
       type,
     },
-    success_url: `${process.env.CLIENT_BASE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.CLIENT_BASE_URL}/payment/cancel`,
+    success_url: `https://facebook.com`,
+    cancel_url: `https://facebook.com`,
   });
 
   return session;
