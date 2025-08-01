@@ -160,12 +160,15 @@ const verify2faOTP = async (otp: string) => {
     config.jwt.access_secret as Secret,
     config.jwt.access_expires_in as string,
   );
+
+  const subscription= await prisma.transaction.findMany({where:{userId:user.id}})
   return {
     id: user.id,
     name: user.firstName,
     email: user.email,
     role: user.role,
     accessToken: accessToken,
+    isSubscription: subscription.length > 0,
     message: 'Logged in successfully.',
   };
 };
