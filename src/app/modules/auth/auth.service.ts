@@ -172,7 +172,7 @@ const verify2faOTP = async (otp: string) => {
     message: 'Logged in successfully.',
   };
 };
-
+// f
 const resetPassword = async (email: string, otp: string, password: string) => {
   const user = await prisma.user.findFirst({
     where: {
