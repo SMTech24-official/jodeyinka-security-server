@@ -43,10 +43,15 @@ const getMyProfileFromDB = async (id: string) => {
   const Profile = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
+    
     },
+    include:{Transaction:{select:{userId:true}}}
   });
 
-  return Profile;
+    return {
+    ...Profile,
+    isSubscription: Profile.Transaction && Profile.Transaction.length > 0
+  };
 };
 
 const getUserDetailsFromDB = async (id: string) => {
