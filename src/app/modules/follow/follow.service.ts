@@ -61,7 +61,7 @@ const getFollowers = async (userId: string) => {
     where: {
       followingId: userId,
     },
-    include: {
+    select: {
       follower: {
         select: {
           id: true,
@@ -76,11 +76,13 @@ const getFollowers = async (userId: string) => {
 };
 
 const getFollowing = async (userId: string) => {
-  return prisma.follow.findMany({
+
+
+   return await prisma.follow.findMany({
     where: {
       followerId: userId,
     },
-    include: {
+    select: {
       following: {
         select: {
           id: true,
@@ -92,6 +94,8 @@ const getFollowing = async (userId: string) => {
       },
     },
   });
+
+
 };
 
 export const followService = {

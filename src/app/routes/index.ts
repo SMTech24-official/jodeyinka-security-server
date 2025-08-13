@@ -16,6 +16,7 @@ import { streamRoutes } from '../modules/stream/stream.route';
 import { favouriteRouters } from '../modules/favourite/favourite.routes';
 import { JobRoutes } from '../modules/job/job.route';
 import { LikeRoutes } from '../modules/like/like.route';
+import { MessagingSystemRoutes } from '../modules/messagingSystem/messaging.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -87,6 +88,12 @@ const moduleRoutes = [
     path: '/like',
     route: LikeRoutes,
   },
+  
+  {
+    path: '/messagingSystems',
+    route: MessagingSystemRoutes,
+  },
+  
   
 ];
 

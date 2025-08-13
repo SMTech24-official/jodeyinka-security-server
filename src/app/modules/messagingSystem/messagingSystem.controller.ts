@@ -9,8 +9,12 @@ import sendResponse from '../../utils/sendResponse';
 
 // ✅ Get all messages for a user
  const getMyMessages = catchAsync(async (req: Request, res: Response) => {
- 
-  const result = await MessagingSystemService.getMyMessages(req.params.receverId,req.params.senderId);
+  const userId = req.user?.userId; // তুমি যদি auth middleware use করো
+  if (!userId) {
+    return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
+  }
+
+  const result = await MessagingSystemService.getMyMessages(userId,req.params.senderId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -22,7 +26,7 @@ import sendResponse from '../../utils/sendResponse';
 
 // ✅ Get all notifications for a user
 const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params?.id; // তুমি যদি auth middleware use করো
+  const userId = req.user?.userId; // তুমি যদি auth middleware use করো
   if (!userId) {
     return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
   }
@@ -39,8 +43,8 @@ const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
 
 
 const getMyChatSidebar = catchAsync(async (req: Request, res: Response) => {
-
-  const chatList = await MessagingSystemService.getMyChatList(req.params.id);
+  const userId = req.user.userId;
+  const chatList = await MessagingSystemService.getMyChatList(userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -208,10 +208,9 @@ import { Server, Socket } from 'socket.io';
 import jwt, { Secret } from 'jsonwebtoken';
 import prisma from '../../utils/prisma';
 import config from '../../../config';
-import { MessagingSystemService } from '../messagingSystem/messagingSystem.service';
-
-import { verifyToken } from '../../utils/verifyToken';
+import { MessagingSystemService } from '../MessagingSystem/messagingSystem.service';
 import { generateRoomId } from '../../utils/generateRoomId';
+import { verifyToken } from '../../utils/verifyToken';
 
 const connectedUsers = new Map<string, string>(); 
 
@@ -311,11 +310,14 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
         return;
       }
 
- 
  const roomId = generateRoomId(senderId, receiverId);
       const createdMessage = await MessagingSystemService.createMessage(senderId, receiverId, content, io, connectedUsers,roomId);
       
-      socket.to(createdMessage.roomId).emit('new_message', createdMessage);
+      socket.emit('new_message', createdMessage);
+      const chatList = await MessagingSystemService.getMyChatList(senderId);
+
+      console.log(chatList)
+      socket.to(senderId).emit('chat-list', chatList);
       console.log(`[Socket.IO - send_message] Emitted 'message_sent_success' to sender ${senderId} (Socket ID: ${socket.id}).`);
 
     } catch (error) {

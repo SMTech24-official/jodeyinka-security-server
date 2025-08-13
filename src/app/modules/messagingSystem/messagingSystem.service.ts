@@ -46,8 +46,8 @@ const createMessage = async (
   const newMessageWithDetails = await prisma.message.findFirst({
     where: { id: message.id },
     include: {
-      receiver: { select: { firstName: true, lastName: true, id: true, email: true, isOnline: true, lastSeen: true } },
-      sender: { select: { firstName: true, lastName: true, id: true,  email: true, isOnline: true, lastSeen: true } },
+      receiver: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
+      sender: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
     },
   });
   console.log(`[MessagingService - createMessage] Fetched new message details for real-time delivery.`);
@@ -100,8 +100,8 @@ const getMyMessages = async (userId1: string, userId2: string) => {
       ],
     },
     include: {
-      receiver: { select: { firstName: true, lastName: true, id: true,  email: true, isOnline: true, lastSeen: true } },
-      sender: { select: { firstName: true, lastName: true, id: true,  email: true, isOnline: true, lastSeen: true } },
+      receiver: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
+      sender: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
     },
     orderBy: { createdAt: 'asc' },
   });
@@ -117,8 +117,8 @@ const getMyChatList = async (userId: string) => {
     },
     orderBy: { createdAt: 'desc' },
     include: {
-      sender: { select: { firstName: true, lastName: true, id: true, email: true, isOnline: true, lastSeen: true } },
-      receiver: { select: { firstName: true, lastName: true, id: true, email: true, isOnline: true, lastSeen: true } }
+      sender: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
+      receiver: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } }
     },
   });
   console.log(`[MessagingService - getMyChatList] Fetched ${messages.length} messages for chat list processing.`);
@@ -134,7 +134,7 @@ const getMyChatList = async (userId: string) => {
           firstName: otherUser.firstName,
           lastName: otherUser.lastName,
           email: otherUser.email,
-         
+          image: otherUser.image,
           isOnline: otherUser.isOnline,
           lastSeen: otherUser.lastSeen
         },
