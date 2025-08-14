@@ -33,6 +33,92 @@ const registerUserIntoDB = async (payload: User|any) => {
   return userWithOptionalPassword;
 };
 
+// mobile Register start
+const mobileRegisterUserIntoDB = async (payload: User|any) => {
+  const hashedPassword: string = await bcrypt.hash(payload?.password, 12);
+  const userData = {
+    ...payload,
+    password: hashedPassword,
+  };
+  if (payload.organizationName) {
+    userData.sponsorStatus = 'PENDING';
+  }
+  const newUser = await prisma.user.create({
+    data: {
+      ...userData,
+    },
+  });
+
+  await mobileResendUserVerificationEmail(newUser.email);
+  const userWithOptionalPassword = newUser as UserWithOptionalPassword;
+  delete userWithOptionalPassword.password;
+
+  return userWithOptionalPassword;
+};
+
+
+const mobileResendUserVerificationEmail = async (email: string) => {
+  
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  const user = await prisma.user.update({
+    where: { email: email },
+    data: {
+      emailVerificationToken: otp,
+      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000), // 1 hour
+    },
+  });
+
+  const emailSender = new Email(user);
+  await emailSender.mobileSendEmailVerificationOTP(
+    'Email verification OTP',
+    otp
+  );
+
+  return user;
+};
+
+
+const mobileVerifyEmailOTP = async (email: string, otp: string) => {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+     throw new AppError(httpStatus.UNAUTHORIZED, 'User not found');
+  
+  }
+
+  if (user.emailVerificationToken !== otp) {
+     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid OTP');
+   
+  }
+
+  if (!user.emailVerificationTokenExpires || user.emailVerificationTokenExpires < new Date()) {
+       throw new AppError(httpStatus.UNAUTHORIZED, 'OTP expired');
+ 
+  }
+
+   const updateResult =  await prisma.user.update({
+    where: { email },
+    data: {
+      isEmailVerified:true,
+      emailVerificationToken: null,
+      emailVerificationTokenExpires: null,
+      sponsorStatus:"APPROVED"
+    },
+    select:{Transaction:{select:{userId:true}}}
+  });
+
+    return {
+     message: 'Email verified successfully',
+    isSubscription: updateResult.Transaction && updateResult.Transaction.length > 0
+  };
+
+
+};
+
+
+// mobile Register end
+
 const getAllUsersFromDB = async () => {
   const result = await prisma.user.findMany({});
 
@@ -249,4 +335,6 @@ export const UserServices = {
   approveSponsorshipRequest,
   deleteSponsorshipRequest,
   toggle2fa,
+  mobileRegisterUserIntoDB,
+  mobileVerifyEmailOTP
 };

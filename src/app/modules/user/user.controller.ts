@@ -14,6 +14,29 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const mobileRegisterUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.mobileRegisterUserIntoDB(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message:
+      'User registered successfully. Please check your email for OTP .',
+    data: result,
+  });
+});
+
+const mobileVerifyEmailOTP = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.mobileVerifyEmailOTP(req.body.email, req.body.otp);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message:
+      'User registered successfully. Please check your email for OTP .',
+    data: result,
+  });
+});
+
+
 
 const verifyUserEmail = catchAsync(async (req: Request, res: Response) => {
   const { token } = req.params;
@@ -168,4 +191,6 @@ export const UserControllers = {
   approveSponsorshipRequest,
   toggle2fa,
   deleteSponsorshipRequest,
+  mobileRegisterUser,
+  mobileVerifyEmailOTP
 };

@@ -204,6 +204,39 @@ export default class Email {
     //03. Create a transporter and send the mail
     await this.newTransport().sendMail(mailOptions);
   }
+ async mobileSendEmailVerificationOTP(subject: string, otp: string) {
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Email Verification OTP</title>
+    <style>
+      body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+      .container { max-width: 500px; background: #fff; padding: 20px; border-radius: 8px; text-align: center; }
+      .otp { font-size: 28px; font-weight: bold; color: #0066FF; letter-spacing: 5px; margin: 20px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Verify Your Email</h2>
+      <p>Use the OTP below to verify your email address:</p>
+      <div class="otp">${otp}</div>
+      <p>This OTP will expire in 1 hour.</p>
+    </div>
+  </body>
+  </html>
+  `;
+
+  const mailOptions = {
+    from: this.from,
+    to: this.to,
+    subject,
+    html,
+  };
+
+  await this.newTransport().sendMail(mailOptions);
+}
 
   async sendWelcome() {
     await this.send('welcome', 'Welcome to XYZ');

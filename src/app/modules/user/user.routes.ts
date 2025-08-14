@@ -13,6 +13,16 @@ router.post(
   UserControllers.registerUser,
 );
 router.post(
+  '/register-for-mobile',
+  validateRequest(UserValidations.registerUser),
+  UserControllers.mobileRegisterUser,
+);
+router.post(
+  '/mobile-verify-email-OTP',
+
+  UserControllers.mobileVerifyEmailOTP,
+);
+router.post(
   '/resend-verification-email',
   UserControllers.resendUserVerificationEmail,
 );
