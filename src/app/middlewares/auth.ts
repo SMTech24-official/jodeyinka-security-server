@@ -40,6 +40,7 @@ const auth = (...roles: string[]) => {
         );
       }
       req.user = verifyUserToken;
+    
       if (roles.length && !roles.includes(verifyUserToken.role)) {
         throw new AppError(httpStatus.FORBIDDEN, 'Forbidden!');
       }

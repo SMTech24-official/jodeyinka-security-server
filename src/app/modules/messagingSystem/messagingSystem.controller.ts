@@ -9,7 +9,7 @@ import sendResponse from '../../utils/sendResponse';
 
 // ✅ Get all messages for a user
  const getMyMessages = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId; // তুমি যদি auth middleware use করো
+  const userId = req.user?.id; // তুমি যদি auth middleware use করো
   if (!userId) {
     return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
   }
@@ -26,7 +26,7 @@ import sendResponse from '../../utils/sendResponse';
 
 // ✅ Get all notifications for a user
 const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user?.userId; // তুমি যদি auth middleware use করো
+  const userId = req.user?.id; // তুমি যদি auth middleware use করো
   if (!userId) {
     return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Unauthorized' });
   }
@@ -43,7 +43,7 @@ const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
 
 
 const getMyChatSidebar = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user.userId;
+  const userId = req.user?.id
   const chatList = await MessagingSystemService.getMyChatList(userId);
 
   sendResponse(res, {
