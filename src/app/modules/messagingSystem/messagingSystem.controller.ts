@@ -44,7 +44,11 @@ const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
 
 const getMyChatSidebar = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user?.id
-  const chatList = await MessagingSystemService.getMyChatList(userId);
+
+  const {searchParams}=req.query
+
+  console.log(searchParams)
+  const chatList = await MessagingSystemService.getMyChatList(userId,searchParams);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

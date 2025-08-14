@@ -296,7 +296,7 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
 
   // --- Messaging Events ---
 
-  // Handle sending a new message
+  // new message
   socket.on('send_message', async ({ senderId, receiverId, content, }) => {
     console.log(`[Socket.IO - send_message] Received message from ${senderId} to ${receiverId}. Content: "${content}"`);
     try {

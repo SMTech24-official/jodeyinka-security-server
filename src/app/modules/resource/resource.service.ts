@@ -205,22 +205,52 @@ const getCommentsOnResource = async (resourceId: string) => {
 
 
 const myComments = async (userId: string) => {
-  const comments = await prisma.comment.findMany({
+  // প্রতিটি resource এর জন্য comment count + সর্বশেষ comment এর ID বের করা
+  const grouped = await prisma.comment.groupBy({
+    by: ['resourceId'],
     where: { authorId: userId },
-    select: {
-    content:true,
-    createdAt:true,
-      Resource: {
-        select: {
-          Author:{select:{image:true,firstName:true,lastName:true,userFullName:true}}
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
+    _count: { _all: true },
+    _max: { createdAt: true },
   });
 
-  return comments;
+  // প্রতিটি resource এর জন্য সর্বশেষ comment ডাটা ফেচ করা
+  const results = await Promise.all(
+    grouped.map(async (g:any) => {
+      const lastComment = await prisma.comment.findFirst({
+        where: {
+          authorId: userId,
+          resourceId: g.resourceId,
+          createdAt: g._max.createdAt,
+        },
+        select: {
+          content: true,
+          createdAt: true,
+          Resource: {
+            select: {
+              Author: {
+                select: {
+                  image: true,
+                  firstName: true,
+                  lastName: true,
+                  userFullName: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        ...lastComment,
+        commentCount: g._count._all,
+      };
+    })
+  );
+
+  // সর্বশেষ comment এর তারিখ দিয়ে sort করা
+  return results.sort((a:any, b:any) => b.createdAt.getTime() - a.createdAt.getTime());
 };
+
 
 const getTrendingResources = async () => {
   const oneWeekAgo = new Date();

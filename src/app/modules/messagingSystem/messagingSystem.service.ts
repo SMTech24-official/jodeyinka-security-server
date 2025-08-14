@@ -109,43 +109,206 @@ const getMyMessages = async (userId1: string, userId2: string) => {
   return messages;
 };
 
-const getMyChatList = async (userId: string) => {
+
+
+// const getMyChatList = async (userId: string, searchParams?: string) => {
+//   console.log(`[MessagingService - getMyChatList] Fetching chat list for User ID: ${userId}.`);
+
+//   const whereCondition: any = {
+//     OR: [{ senderId: userId }, { receiverId: userId }],
+//   };
+
+//   if (searchParams) {
+//     whereCondition.AND = [
+//       {
+//         OR: [
+//           {
+//             receiver: {
+//               OR: [
+//                 { firstName: { contains: searchParams, mode: 'insensitive' } },
+//                 { lastName: { contains: searchParams, mode: 'insensitive' } },
+//                 { userFullName: { contains: searchParams, mode: 'insensitive' } },
+//               ],
+//             },
+//           },
+//           {
+//             sender: {
+//               OR: [
+//                 { firstName: { contains: searchParams, mode: 'insensitive' } },
+//                 { lastName: { contains: searchParams, mode: 'insensitive' } },
+//                 { userFullName: { contains: searchParams, mode: 'insensitive' } },
+//               ],
+//             },
+//           },
+//         ],
+//       },
+//     ];
+//   }
+
+//   const messages = await prisma.message.findMany({
+//     where: whereCondition,
+//     orderBy: { createdAt: 'desc' },
+//     include: {
+//       sender: {
+//         select: {
+//           firstName: true,
+//           lastName: true,
+//           userFullName: true,
+//           id: true,
+//           image: true,
+//           email: true,
+//           isOnline: true,
+//           lastSeen: true,
+//         },
+//       },
+//       receiver: {
+//         select: {
+//           firstName: true,
+//           lastName: true,
+//           userFullName: true,
+//           id: true,
+//           image: true,
+//           email: true,
+//           isOnline: true,
+//           lastSeen: true,
+//         },
+//       },
+//     },
+//   });
+
+//   console.log(`[MessagingService - getMyChatList] Fetched ${messages.length} messages for chat list processing.`);
+
+//   const chatMap = new Map<string, any>();
+
+//   for (const msg of messages) {
+//     const otherUser = msg.senderId === userId ? msg.receiver : msg.sender;
+//     if (!chatMap.has(otherUser.id)) {
+//       chatMap.set(otherUser.id, {
+//         user: {
+//           id: otherUser.id,
+//           firstName: otherUser.firstName,
+//           lastName: otherUser.lastName,
+//           email: otherUser.email,
+//           image: otherUser.image,
+//           isOnline: otherUser.isOnline,
+//           lastSeen: otherUser.lastSeen,
+//         },
+//         lastMessage: msg,
+//       });
+//     }
+//   }
+
+//   const chatList = Array.from(chatMap.values());
+//   console.log(`[MessagingService - getMyChatList] Generated chat list with ${chatList.length} unique chats.`);
+
+//   return chatList;
+// };
+
+
+const getMyChatList = async (userId: string, searchParams?: any) => {
   console.log(`[MessagingService - getMyChatList] Fetching chat list for User ID: ${userId}.`);
+
+  const whereCondition: any = {
+    OR: [{ senderId: userId }, { receiverId: userId }],
+  };
+
+  if (searchParams) {
+    whereCondition.AND = [
+      {
+        OR: [
+          {
+            receiver: {
+              OR: [
+                { firstName: { contains: searchParams, mode: 'insensitive' } },
+                { lastName: { contains: searchParams, mode: 'insensitive' } },
+                { userFullName: { contains: searchParams, mode: 'insensitive' } },
+              ],
+            },
+          },
+          {
+            sender: {
+              OR: [
+                { firstName: { contains: searchParams, mode: 'insensitive' } },
+                { lastName: { contains: searchParams, mode: 'insensitive' } },
+                { userFullName: { contains: searchParams, mode: 'insensitive' } },
+              ],
+            },
+          },
+        ],
+      },
+    ];
+  }
+
   const messages = await prisma.message.findMany({
-    where: {
-      OR: [{ senderId: userId }, { receiverId: userId }],
-    },
+    where: whereCondition,
     orderBy: { createdAt: 'desc' },
     include: {
-      sender: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } },
-      receiver: { select: { firstName: true, lastName: true, id: true, image: true, email: true, isOnline: true, lastSeen: true } }
+      sender: {
+        select: {
+          firstName: true,
+          lastName: true,
+          userFullName: true,
+          id: true,
+          image: true,
+          email: true,
+          isOnline: true,
+          lastSeen: true,
+        },
+      },
+      receiver: {
+        select: {
+          firstName: true,
+          lastName: true,
+          userFullName: true,
+          id: true,
+          image: true,
+          email: true,
+          isOnline: true,
+          lastSeen: true,
+        },
+      },
     },
   });
+
   console.log(`[MessagingService - getMyChatList] Fetched ${messages.length} messages for chat list processing.`);
 
-  const chatMap = new Map<string, any>(); 
+  const chatMap = new Map<string, any>();
 
   for (const msg of messages) {
     const otherUser = msg.senderId === userId ? msg.receiver : msg.sender;
+
     if (!chatMap.has(otherUser.id)) {
+      // Unseen message count (যেখানে আমি receiver আর seen = false)
+      const unseenCount = await prisma.message.count({
+        where: {
+          senderId: otherUser.id,
+          receiverId: userId,
+          seen: false,
+        },
+      });
+
       chatMap.set(otherUser.id, {
-        user: { 
+        user: {
           id: otherUser.id,
           firstName: otherUser.firstName,
           lastName: otherUser.lastName,
           email: otherUser.email,
           image: otherUser.image,
           isOnline: otherUser.isOnline,
-          lastSeen: otherUser.lastSeen
+          lastSeen: otherUser.lastSeen,
         },
         lastMessage: msg,
+        unseenMessageCount: unseenCount,
       });
     }
   }
+
   const chatList = Array.from(chatMap.values());
   console.log(`[MessagingService - getMyChatList] Generated chat list with ${chatList.length} unique chats.`);
+
   return chatList;
 };
+
 
 const getMyNotifications = async (userId: string) => {
   console.log(`[MessagingService - getMyNotifications] Fetching notifications for User ID: ${userId}.`);
