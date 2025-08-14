@@ -31,5 +31,8 @@ router
   .route('/:resourceId/comment')
   .get(auth(), resourceControllers.getCommentsOnResource)
   .post(auth(), resourceControllers.createCommentOnResource);
-
+router
+  .route('/myComments/me')
+  .get(auth(), resourceControllers.myComments)
+ 
 export const resourceRouter = router;

@@ -149,6 +149,20 @@ const getCommentsOnResource = catchAsync(
   },
 );
 
+
+const myComments = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.user;
+    const comments = await resourceServices.myComments(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Comments retrieved successfully.',
+      data: comments,
+    });
+  },
+);
+
 const getTrendingResources = catchAsync(async (req: Request, res: Response) => {
   const trending = await resourceServices.getTrendingResources();
   sendResponse(res, {
@@ -169,5 +183,6 @@ export const resourceControllers = {
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,
-  getResourcesForMobile
+  getResourcesForMobile,
+  myComments
 };

@@ -203,6 +203,25 @@ const getCommentsOnResource = async (resourceId: string) => {
   return comments;
 };
 
+
+const myComments = async (userId: string) => {
+  const comments = await prisma.comment.findMany({
+    where: { authorId: userId },
+    select: {
+    content:true,
+    createdAt:true,
+      Resource: {
+        select: {
+          Author:{select:{image:true,firstName:true,lastName:true,userFullName:true}}
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return comments;
+};
+
 const getTrendingResources = async () => {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -245,5 +264,6 @@ export const resourceServices = {
   createCommentOnResource,
   getCommentsOnResource,
   getTrendingResources,
-  getResourcesForMobile
+  getResourcesForMobile,
+  myComments
 };
