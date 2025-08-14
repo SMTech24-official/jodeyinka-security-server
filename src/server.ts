@@ -63,6 +63,7 @@ async function main() {
       'https://www.worldcybersecurityforum.org',
       'https://worldcybersecurityforum.org',
       "http://localhost:5173",
+      "https://jodeyinka.code-commando.com",
       "*"
     ],
       methods: ["GET", "POST"],
