@@ -16,6 +16,7 @@ const loginUserFromDB = async (payload: {
     where: {
       email: payload.email,
     },
+     include:{Transaction:{select:{userId:true}}}
   });
 
     if (!userData.password) {
@@ -59,6 +60,7 @@ const loginUserFromDB = async (payload: {
     email: userData.email,
     role: userData.role,
     accessToken: accessToken,
+    isSubscription: userData.Transaction && userData.Transaction.length > 0,
     message: 'Logged in successfully.',
   };
 };
