@@ -43,9 +43,11 @@ const mobileRegisterUserIntoDB = async (payload: User|any) => {
   if (payload.organizationName) {
     userData.sponsorStatus = 'PENDING';
   }
+  userData.twoFactor=true
   const newUser = await prisma.user.create({
     data: {
       ...userData,
+      
     },
   });
 
