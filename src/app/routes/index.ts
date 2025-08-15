@@ -10,13 +10,14 @@ import { resourceRouter } from '../modules/resource/resource.route';
 import { transactionRouter } from '../modules/transaction/transaction.route';
 import { eventUsersRouter } from '../modules/eventUsers/eventUsers.route';
 import { notificationRouter } from '../modules/notification/notification.route';
-import { stripeRoute } from '../modules/stripe/stripe.route';
+// import { stripeRoute } from '../modules/stripe/stripe.route';
 import { followRouter } from '../modules/follow/follow.route';
 import { streamRoutes } from '../modules/stream/stream.route';
 import { favouriteRouters } from '../modules/favourite/favourite.routes';
 import { JobRoutes } from '../modules/job/job.route';
 import { LikeRoutes } from '../modules/like/like.route';
 import { MessagingSystemRoutes } from '../modules/messagingSystem/messaging.route';
+import { subscriptionRouter } from '../modules/stripe/stripe.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -36,9 +37,15 @@ const moduleRoutes = [
     path: '/paypal',
     route: paypalRouter,
   },
+  // {
+  //   path: '/stripe',
+  //   route: stripeRoute,
+  // },
+
+
   {
     path: '/stripe',
-    route: stripeRoute,
+    route: subscriptionRouter,
   },
   {
     path: '/contact',

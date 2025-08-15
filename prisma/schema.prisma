@@ -16,6 +16,7 @@ model User {
   lastName                      String?
   userName                      String?
   userFullName                  String?
+  stripeCustomerId              String?            @default("")
   organizationName              String?
   email                         String          @unique
   country                       String?
@@ -70,6 +71,8 @@ model User {
 
   NotificationSender Notifications[] @relation("NotificationSender")
   NotificationReceiver Notifications[] @relation("NotificationReceiver")
+  Subscription_Plan Subscription_Plan[]
+  UserSubscription UserSubscription[]
 }
 
 model Resource {
@@ -257,12 +260,39 @@ model Transaction {
 
   @@map("transactions")
 }
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
-  PAST_DUE
-  UNPAID
+
+enum IntervalType {
+  month
+  year
+  lifetime
 }
+
+model Subscription_Plan {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  priceId     String   @unique
+  paymentType String   @default("Stripe")
+  active      Boolean   @default(true)
+  interval    IntervalType  // "month", "year", অথবা "lifetime"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userRole UserRoleEnum  @default(MEMBER)
+  
+
+  @@unique([userId, name])
+  @@map("Subscription_Plan")
+}
+
+
+
+// enum SubscriptionStatus {
+//   ACTIVE
+//   CANCELLED
+//   PAST_DUE
+//   UNPAID
+// }
 
 model Follow {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -414,4 +444,61 @@ enum ResourceType {
   MEDIA
   RESOURCE
   BLOG
+}
+
+
+
+
+
+// ---------------------
+
+enum SubscriptionType {
+  GOLD
+  FREE
+  PLATINUM
+  SILVER
+  LIFETIME
+}
+
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  DEACTIVE
+}
+
+
+model Subscription {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  pricingId      String?          @unique
+  productId      String?          @unique
+  interval       IntervalType
+  interval_count Int
+  price          Float
+  title          SubscriptionType
+  features       Json             @db.Json
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  UserSubscription UserSubscription[]
+
+  @@map("subscription")
+}
+
+model UserSubscription {
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String             @db.ObjectId
+  user              User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId    String             @db.ObjectId
+  subscription      Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  priceId           String?
+  subscriptionPayId String?            @unique
+  status            SubscriptionStatus @default(PENDING)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([userId, subscriptionId])
+  @@unique([userId, priceId])
+  @@map("userSubscription")
 }
