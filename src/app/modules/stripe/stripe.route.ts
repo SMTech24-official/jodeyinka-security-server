@@ -23,8 +23,7 @@
 import { Router } from "express";
 import auth from "../../middlewares/auth";
 
-import validateRequest from "../../middlewares/validateRequest";
-import { subscriptionValidation } from "./stripe.validation";
+
 import { subscriptionController } from "./stripe.controller";
 
 

@@ -111,7 +111,7 @@ import { Request, Response } from "express";
 import sendResponse from "../../utils/sendResponse";
 import { subscriptionService } from "./stripe.service";
 import catchAsync from "../../utils/catchAsync";
-import prisma from "../../utils/prisma";
+
 
 const createSubscriptionPlan = catchAsync(
   async (req: Request, res: Response) => {

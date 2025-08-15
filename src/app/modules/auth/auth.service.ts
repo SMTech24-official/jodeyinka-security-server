@@ -166,13 +166,9 @@ const verify2faOTP = async (otp: string) => {
     config.jwt.access_secret as Secret,
     config.jwt.access_expires_in as string,
   );
-  const Profile = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: user.id,
-    
-    },
-    include:{Transaction:{select:{userId:true}}}
-  });
+  const subscriptions= await prisma.userSubscription.findFirst({where:{userId:user.id}})
+
+
 
 
   return {
@@ -181,7 +177,7 @@ const verify2faOTP = async (otp: string) => {
     email: user.email,
     role: user.role,
     accessToken: accessToken,
-   isSubscription: Profile.Transaction && Profile.Transaction.length > 0,
+   isSubscription:  subscriptions? true:false,
     message: 'Logged in successfully.',
   };
 };

@@ -133,12 +133,16 @@ const getMyProfileFromDB = async (id: string) => {
       id: id,
     
     },
-    include:{Transaction:{select:{userId:true}}}
+   
   });
+
+
+  const subscriptions= await prisma.userSubscription.findFirst({where:{userId:id}})
+
 
     return {
     ...Profile,
-    isSubscription: Profile.Transaction && Profile.Transaction.length > 0
+    isSubscription:  subscriptions? true:false
   };
 };
 
