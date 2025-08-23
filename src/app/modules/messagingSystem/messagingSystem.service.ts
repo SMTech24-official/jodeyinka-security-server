@@ -111,7 +111,9 @@ const getMyMessages = async (userId1: string, userId2: string) => {
 
 
 
-// const getMyChatList = async (userId: string, searchParams?: string) => {
+
+
+// const getMyChatList = async (userId: string, searchParams?: any) => {
 //   console.log(`[MessagingService - getMyChatList] Fetching chat list for User ID: ${userId}.`);
 
 //   const whereCondition: any = {
@@ -182,7 +184,17 @@ const getMyMessages = async (userId1: string, userId2: string) => {
 
 //   for (const msg of messages) {
 //     const otherUser = msg.senderId === userId ? msg.receiver : msg.sender;
+
 //     if (!chatMap.has(otherUser.id)) {
+//       // Unseen message count (যেখানে আমি receiver আর seen = false)
+//       const unseenCount = await prisma.message.count({
+//         where: {
+//           senderId: otherUser.id,
+//           receiverId: userId,
+//           seen: false,
+//         },
+//       });
+
 //       chatMap.set(otherUser.id, {
 //         user: {
 //           id: otherUser.id,
@@ -194,6 +206,7 @@ const getMyMessages = async (userId1: string, userId2: string) => {
 //           lastSeen: otherUser.lastSeen,
 //         },
 //         lastMessage: msg,
+//         unseenMessageCount: unseenCount,
 //       });
 //     }
 //   }
@@ -208,108 +221,91 @@ const getMyMessages = async (userId1: string, userId2: string) => {
 const getMyChatList = async (userId: string, searchParams?: any) => {
   console.log(`[MessagingService - getMyChatList] Fetching chat list for User ID: ${userId}.`);
 
-  const whereCondition: any = {
-    OR: [{ senderId: userId }, { receiverId: userId }],
-  };
-
-  if (searchParams) {
-    whereCondition.AND = [
-      {
-        OR: [
-          {
-            receiver: {
-              OR: [
-                { firstName: { contains: searchParams, mode: 'insensitive' } },
-                { lastName: { contains: searchParams, mode: 'insensitive' } },
-                { userFullName: { contains: searchParams, mode: 'insensitive' } },
-              ],
-            },
-          },
-          {
-            sender: {
-              OR: [
-                { firstName: { contains: searchParams, mode: 'insensitive' } },
-                { lastName: { contains: searchParams, mode: 'insensitive' } },
-                { userFullName: { contains: searchParams, mode: 'insensitive' } },
-              ],
-            },
-          },
-        ],
-      },
-    ];
-  }
-
-  const messages = await prisma.message.findMany({
-    where: whereCondition,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      sender: {
-        select: {
-          firstName: true,
-          lastName: true,
-          userFullName: true,
-          id: true,
-          image: true,
-          email: true,
-          isOnline: true,
-          lastSeen: true,
-        },
-      },
-      receiver: {
-        select: {
-          firstName: true,
-          lastName: true,
-          userFullName: true,
-          id: true,
-          image: true,
-          email: true,
-          isOnline: true,
-          lastSeen: true,
-        },
-      },
+  // Step 1: Ami jader shathe chat korechi, shob unique user ID khuje ber kora hochche.
+  const chatParticipants = await prisma.message.findMany({
+    where: {
+      OR: [{ senderId: userId }, { receiverId: userId }],
+    },
+    distinct: ['senderId', 'receiverId'],
+    select: {
+      senderId: true,
+      receiverId: true,
     },
   });
 
-  console.log(`[MessagingService - getMyChatList] Fetched ${messages.length} messages for chat list processing.`);
+  const otherUserIds = new Set<string>();
+  chatParticipants.forEach(p => {
+    if (p.senderId !== userId) {
+      otherUserIds.add(p.senderId);
+    }
+    if (p.receiverId !== userId) {
+      otherUserIds.add(p.receiverId);
+    }
+  });
 
-  const chatMap = new Map<string, any>();
+  // Step 2: User table-e search korar jonno condition toiri kora.
+  const whereCondition: any = {
+    id: { in: Array.from(otherUserIds) },
+  };
 
-  for (const msg of messages) {
-    const otherUser = msg.senderId === userId ? msg.receiver : msg.sender;
+  if (searchParams) {
+    whereCondition.OR = [
+      { firstName: { contains: searchParams, mode: 'insensitive' } },
+      { lastName: { contains: searchParams, mode: 'insensitive' } },
+      { userFullName: { contains: searchParams, mode: 'insensitive' } },
+    ];
+  }
 
-    if (!chatMap.has(otherUser.id)) {
-      // Unseen message count (যেখানে আমি receiver আর seen = false)
-      const unseenCount = await prisma.message.count({
+  // Step 3: Proyojoniyo users-der data khuje ber kora.
+  const users = await prisma.user.findMany({
+    where: whereCondition,
+    select: {
+      firstName: true,
+      lastName: true,
+      userFullName: true,
+      id: true,
+      image: true,
+      email: true,
+      isOnline: true,
+      lastSeen: true,
+    },
+  });
+
+  // Step 4: Proti user-er jonno latest message ebong unseen message-er shonkha niye chat list toiri kora.
+  const chatList = await Promise.all(
+    users.map(async (user) => {
+      // Shobcheye notun message-ti khuje ber kora.
+      const lastMessage = await prisma.message.findFirst({
         where: {
-          senderId: otherUser.id,
+          OR: [
+            { senderId: user.id, receiverId: userId },
+            { senderId: userId, receiverId: user.id },
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Ei user theke amake pathano unseen message count kora.
+      const unseenMessageCount = await prisma.message.count({
+        where: {
+          senderId: user.id,
           receiverId: userId,
           seen: false,
         },
       });
 
-      chatMap.set(otherUser.id, {
-        user: {
-          id: otherUser.id,
-          firstName: otherUser.firstName,
-          lastName: otherUser.lastName,
-          email: otherUser.email,
-          image: otherUser.image,
-          isOnline: otherUser.isOnline,
-          lastSeen: otherUser.lastSeen,
-        },
-        lastMessage: msg,
-        unseenMessageCount: unseenCount,
-      });
-    }
-  }
+      return {
+        user,
+        lastMessage,
+        unseenMessageCount,
+      };
+    })
+  );
 
-  const chatList = Array.from(chatMap.values());
   console.log(`[MessagingService - getMyChatList] Generated chat list with ${chatList.length} unique chats.`);
 
   return chatList;
 };
-
-
 const getMyNotifications = async (userId: string) => {
   console.log(`[MessagingService - getMyNotifications] Fetching notifications for User ID: ${userId}.`);
   const notifications = prisma.notifications.findMany({

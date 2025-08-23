@@ -25,12 +25,22 @@ const createResource = async (
 const getResources = async (
   type: string,
   paginationOptions: IPaginationOptions,
+  searchparam?: any // searchparam ke optional kora holo '?' diye
 ) => {
-  const { limit, skip } =
-    paginationHelpers.calculatePagination(paginationOptions);
+  const { limit, skip } = paginationHelpers.calculatePagination(paginationOptions);
+
+  const andConditions: any[] = [{ type: type as ResourceType }];
+  console.log(searchparam);
+
+  if (searchparam) {
+    andConditions.push({
+      title: { contains: searchparam, mode: 'insensitive' },
+    });
+  }
+
   const resources = await prisma.resource.findMany({
     where: {
-      type: type as ResourceType,
+      AND: andConditions,
     },
     skip,
     take: limit,
@@ -46,9 +56,11 @@ const getResources = async (
       },
     },
   });
+
+
+
   return resources;
 };
-
 const getResourcesForMobile = async (
 
   paginationOptions: IPaginationOptions,
@@ -60,7 +72,7 @@ const getResourcesForMobile = async (
     where: {
       OR: [
         { title: { contains: searchparam, mode: 'insensitive' } },
-        { description: { contains: searchparam, mode: 'insensitive' } },
+        // { description: { contains: searchparam, mode: 'insensitive' } },
 
       ],
     },
@@ -78,6 +90,8 @@ const getResourcesForMobile = async (
       },
     },
   });
+
+
   return resources;
 };
 

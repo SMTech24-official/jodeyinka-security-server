@@ -12,6 +12,14 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const mobileLogin = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.mobileLogin(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: result.message,
+    data: result,
+  });
+});
 const googleLoginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.googleLoginUserFromDB(req.body);
   sendResponse(res, {
@@ -80,7 +88,16 @@ const twoFactor = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
+const mobileVerifyOTP = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const result = await AuthServices.mobileVerifyOTP(email, otp,req?.body?.type);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'OTP verified successfully.', // Message-ti change kora hoyeche
+    data: result,
+  });
+});
 export const AuthControllers = {
   loginUser,
   forgotPassword,
@@ -89,5 +106,7 @@ export const AuthControllers = {
   twoFactor,
   resetPassword,
   refreshToken,
-  googleLoginUser
+  googleLoginUser,
+  mobileVerifyOTP,
+  mobileLogin
 };

@@ -59,27 +59,26 @@ const mobileRegisterUserIntoDB = async (payload: User|any) => {
 };
 
 
-const mobileResendUserVerificationEmail = async (email: string) => {
-  
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+export const mobileResendUserVerificationEmail = async (email: string) => {
+  
+  const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit OTP toiri kora hochche
 
-  const user = await prisma.user.update({
-    where: { email: email },
-    data: {
-      emailVerificationToken: otp,
-      emailVerificationTokenExpires: new Date(Date.now() + 3600 * 1000), // 1 hour
-    },
-  });
+  const user = await prisma.user.update({
+    where: { email: email },
+    data: {
+      emailVerificationToken: otp,
+      emailVerificationTokenExpires: new Date(Date.now() + 10 * 60 * 1000), // 10 minute
+    },
+  });
 
-  const emailSender = new Email(user);
-  await emailSender.mobileSendEmailVerificationOTP(
-    'Email verification OTP',
-    otp
-  );
+  const emailSender = new Email(user);
+  await emailSender.mobileSendEmailVerificationOTP(
+    'Email verification OTP',
+    otp
+  );
 
-  return user;
+  return user;
 };
-
 
 const mobileVerifyEmailOTP = async (email: string, otp: string) => {
   const user = await prisma.user.findUnique({ where: { email } });

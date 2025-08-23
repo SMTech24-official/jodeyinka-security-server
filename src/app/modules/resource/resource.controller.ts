@@ -37,6 +37,7 @@ const getResources = catchAsync(async (req: Request, res: Response) => {
   const resources = await resourceServices.getResources(
     type,
     paginationOptions,
+    req.query.searchparam
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
