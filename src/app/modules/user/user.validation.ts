@@ -3,10 +3,10 @@ const registerUser = z.object({
   body: z.object({
     firstName: z.string({
       required_error: 'First Name is required!',
-    }),
+    }).optional(),
     lastName: z.string({
       required_error: 'Last Name is required!',
-    }),
+    }).optional(),
     email: z
       .string({
         required_error: 'Email is required!',

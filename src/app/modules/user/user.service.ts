@@ -35,6 +35,13 @@ const registerUserIntoDB = async (payload: User|any) => {
 
 // mobile Register start
 const mobileRegisterUserIntoDB = async (payload: User|any) => {
+
+  const email=await prisma.user.findFirst({where:{email:payload.email}})
+
+     if (email) {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'Email is already exist!');
+      }
+
   const hashedPassword: string = await bcrypt.hash(payload?.password, 12);
   const userData = {
     ...payload,
