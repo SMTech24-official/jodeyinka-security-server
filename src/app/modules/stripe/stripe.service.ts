@@ -626,9 +626,39 @@ const handleSubscriptionCreated = async (payload: any) => {
 };
 
 
-const mySubscription = async (userId: any) => {
- 
-  return await prisma.userSubscription.findFirst({where:{userId},select:{subscription:true}})
+const mySubscription = async (userId: string) => {
+  const data:any = await prisma.userSubscription.findFirst({
+    where: { userId },
+    select: {
+      subscription: {
+        select: {
+          id:true,
+          title: true,
+        },
+      },
+      user: {
+        select: {
+          role: true,
+        },
+      },
+    },
+  });
+
+  if (!data) return null;
+
+  // replace logic
+  const subscriptionTitle =
+    data.user.role === "SPONSOR" && data.subscription?.title === "BRONZE"
+      ? "BASIC"
+      : data.subscription?.title;
+
+  return {
+    
+    subscription: {
+       id:  data.subscription.id,
+      title: subscriptionTitle||data.subscription?.title,
+    },
+  };
 };
 
 
