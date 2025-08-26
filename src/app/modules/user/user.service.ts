@@ -111,7 +111,9 @@ const mobileVerifyEmailOTP = async (email: string, otp: string) => {
       isEmailVerified:true,
       emailVerificationToken: null,
       emailVerificationTokenExpires: null,
-      sponsorStatus:"APPROVED"
+      sponsorStatus:"APPROVED",
+    
+   
     },
     select:{Transaction:{select:{userId:true}}}
   });

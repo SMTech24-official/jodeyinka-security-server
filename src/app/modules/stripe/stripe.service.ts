@@ -175,209 +175,362 @@ import AppError from "../../errors/AppError";
 const stripe = new Stripe(process.env.STRIPE_SK_KEY as string,);
 
 
+// const createSubscriptionIntoDb = async (payload: any) => {
+//   let product: Stripe.Product | null = null;
+//   // let prices: Stripe.Price | null = null;
+//   let price: any;
+
+//   console.log(183)
+//   console.log(payload)
+//   if (payload.title !== SubscriptionType.FREE) {
+//     product = await stripe.products.create({
+//       name: payload.title,
+
+//       default_price_data: {
+//         currency: "usd",
+//         unit_amount: Math.round(parseFloat(payload.price) * 100),
+//         recurring: {
+//           interval: payload.interval,
+//           interval_count: payload.interval_count,
+//         },
+//       },
+//       expand: ["default_price"],
+//     });
+//     if (!product) {
+//       // throw new ApiError(httpStatus.NOT_FOUND, "product not crated");
+//        throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
+//     }
+
+//     price = product.default_price as Stripe.Price;
+//   }
+
+//   const subsription = await prisma.subscription.create({
+//     data: {
+//       features: payload.features,
+//       price: payload.price as number,
+//       productId: payload.title === SubscriptionType.FREE ? null : product?.id,
+//       pricingId: payload.title === SubscriptionType.FREE ? null : price.id,
+//       interval: payload.interval,
+//       interval_count: payload.interval_count,
+//       title: payload.title,
+//     },
+//   });
+//   return subsription;
+// };
+
 const createSubscriptionIntoDb = async (payload: any) => {
   let product: Stripe.Product | null = null;
-  // let prices: Stripe.Price | null = null;
-  let price: any;
+  let price: Stripe.Price | null = null;
 
-  console.log(183)
-  console.log(payload)
-  if (payload.title !== SubscriptionType.FREE) {
+  // Determine interval
+  let interval: "month" | "year" | "lifetime" = "lifetime";
+  if (["BASIC", "PREMIUM"].includes(payload.title)) interval = "year";
+
+  if (payload.price > 0) {
     product = await stripe.products.create({
       name: payload.title,
-
       default_price_data: {
         currency: "usd",
-        unit_amount: Math.round(parseFloat(payload.price) * 100),
-        recurring: {
-          interval: payload.interval,
-          interval_count: payload.interval_count,
-        },
+        unit_amount: Math.round(payload.price * 100),
+        recurring: interval === "lifetime" ? undefined : { interval },
       },
       expand: ["default_price"],
     });
-    if (!product) {
-      // throw new ApiError(httpStatus.NOT_FOUND, "product not crated");
-       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
-    }
+
+    if (!product) throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Product creation failed");
 
     price = product.default_price as Stripe.Price;
   }
 
-  const subsription = await prisma.subscription.create({
+  // Save into DB
+  const subscription = await prisma.subscription.create({
     data: {
-      features: payload.features,
-      price: payload.price as number,
-      productId: payload.title === SubscriptionType.FREE ? null : product?.id,
-      pricingId: payload.title === SubscriptionType.FREE ? null : price.id,
-      interval: payload.interval,
-      interval_count: payload.interval_count,
       title: payload.title,
+      price: payload.price,
+      interval: interval,
+      interval_count: 1,
+      features: payload.features || [],
+      productId: product?.id || null,
+      pricingId: price?.id || null,
     },
   });
-  return subsription;
+
+  return subscription;
 };
+
+
+
+// const getAllSubscriptionPlans = async (userId: string) => {
+//   const user = await prisma.user.findUnique(
+//     {
+//       where :{
+//         id: userId
+//       }
+//     }
+//   )
+//     if(!user) throw new AppError(httpStatus.NOT_FOUND, "user not found")
+//       if(user.role === UserRoleEnum.SPONSOR) {
+        
+//   const subscription = await prisma.subscription.findMany({
+//     where: {
+//       title: SubscriptionType.LIFETIME
+//     }
+//   });
+//   return subscription;
+
+//       }
+
+//   const subscription = await prisma.subscription.findMany({
+//     where: {
+//      NOT: {
+//       title: "LIFETIME",
+//     },
+//     },
+//     orderBy: {
+//       createdAt: "asc",
+//     },
+//   });
+//   return subscription;
+// };
 
 const getAllSubscriptionPlans = async (userId: string) => {
-  const user = await prisma.user.findUnique(
-    {
-      where :{
-        id: userId
-      }
-    }
-  )
-    if(!user) throw new AppError(httpStatus.NOT_FOUND, "user not found")
-      if(user.role === UserRoleEnum.SPONSOR) {
-        
-  const subscription = await prisma.subscription.findMany({
-    where: {
-      title: SubscriptionType.LIFETIME
-    }
-  });
-  return subscription;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
-      }
-
-  const subscription = await prisma.subscription.findMany({
-    where: {
-     NOT: {
-      title: "LIFETIME",
-    },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
+  if (user.role === "SPONSOR") {
+    // Sponsor sees yearly subscriptions
+      const subscriptions = await prisma.subscription.findMany({
+    where: { title: { in: ["BRONZE", "PREMIUM"] } },
+    orderBy: { createdAt: "asc" },
   });
-  return subscription;
+
+  // response modify করা: BRONZE → BASIC
+  const modifiedResponse = subscriptions.map(sub => ({
+    ...sub,
+    title: sub.title === "BRONZE" ? "BASIC" : sub.title,
+  }));
+
+  return modifiedResponse;
+  }
+
+  // Members see lifetime plans
+  return prisma.subscription.findMany({
+    where: { title: { in: ["BRONZE", "GOLD", "SILVER", "PLATINUM"] } },
+    orderBy: { createdAt: "asc" },
+  });
 };
+
+
+
+
+
+interface PurchaseSubscriptionPayload {
+  subscriptionId: string;
+  paymentMethodId?: string; // Free plan হলে paymentMethodId optional
+}
+//   const purchaseSubscription = async (
+//   payload: PurchaseSubscriptionPayload,
+//   userId: string
+// ) => {
+//   // 1️⃣ Validate User
+//   const user = await prisma.user.findUnique({ where: { id: userId } });
+//   if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+
+
+//   const userSubscription= await prisma.userSubscription.findFirst({where:{userId:userId}})
+//    if (userSubscription) throw new AppError(httpStatus.UNAUTHORIZED, 'you have already subscribe please cancel first unsubscribe ');
+//   // 2️⃣ Validate Subscription Plan
+//   const subscriptionPlan = await prisma.subscription.findUnique({
+//     where: { id: payload.subscriptionId },
+//   });
+//   if (!subscriptionPlan) throw new AppError(httpStatus.NOT_FOUND, 'Subscription plan not found');
+
+//   // 3️⃣ Stripe Customer Creation (if needed)
+//   let stripeCustomerId = user.stripeCustomerId;
+//   const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.userFullName;
+
+//   if (!stripeCustomerId && subscriptionPlan.price > 0) {
+//     const customer = await stripe.customers.create({ email: user.email, name: fullName });
+//     stripeCustomerId = customer.id;
+//     await prisma.user.update({ where: { id: userId }, data: { stripeCustomerId } });
+//   }
+
+//   const isFreePlan = subscriptionPlan.price === 0;
+
+//   // 4️⃣ Free Plan Handling
+//   if (isFreePlan) {
+//     return prisma.userSubscription.upsert({
+//       where: { userId_subscriptionId: { userId, subscriptionId: subscriptionPlan.id } },
+//       create: { userId, subscriptionId: subscriptionPlan.id, status: SubscriptionStatus.ACTIVE },
+//       update: { status: SubscriptionStatus.ACTIVE },
+//     });
+//   }
+
+//   // 5️⃣ Paid Plan Handling
+//   if (!payload.paymentMethodId)
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Payment method is required for paid plans');
+
+//   if (!subscriptionPlan.pricingId)
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Missing Stripe priceId for this plan');
+
+//   // Attach payment method to customer
+//   await stripe.paymentMethods.attach(payload.paymentMethodId, { customer: stripeCustomerId! });
+//   await stripe.customers.update(stripeCustomerId!, {
+//     invoice_settings: { default_payment_method: payload.paymentMethodId },
+//   });
+
+//   // Create Stripe subscription
+//   const stripeSub = await stripe.subscriptions.create({
+//     customer: stripeCustomerId!,
+//     items: [{ price: subscriptionPlan.pricingId }],
+//     metadata: { subscriptionId: subscriptionPlan.id, userId },
+//     payment_settings: { payment_method_types: ['card'], save_default_payment_method: 'on_subscription' },
+//     expand: ['latest_invoice'],
+//   });
+
+//   // Save in DB
+//   return prisma.userSubscription.create({
+//     data: {
+//       userId,
+//       subscriptionId: subscriptionPlan.id,
+//       priceId: subscriptionPlan.pricingId,
+//       subscriptionPayId: stripeSub.id,
+//       status: SubscriptionStatus.ACTIVE,
+//     },
+//   });
+// };
+
+
 const purchaseSubscription = async (
-  payload: any,
-  userId: string,
-  // email: string,
-  // fullName: string,
-  // stripeCustomerId?: string
+  payload: PurchaseSubscriptionPayload,
+  userId: string
 ) => {
-  const [user, subscriptionPlan ] = await prisma.$transaction([
-    prisma.user.findUnique(
-    {
-      where :{
-        id: userId
-      }
-    }
-  ),
-  prisma.subscription.findUnique({
+  // 1️⃣ Validate User
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+
+  // 2️⃣ Check if user already has a subscription
+  const userSubscription = await prisma.userSubscription.findFirst({ where: { userId } });
+  if (userSubscription)
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You have already subscribed. Please unsubscribe first.'
+    );
+
+  // 3️⃣ Validate Subscription Plan
+  const subscriptionPlan = await prisma.subscription.findUnique({
     where: { id: payload.subscriptionId },
-  })
-  ]);
-
-    if (!subscriptionPlan) {
-    throw new AppError(httpStatus.NOT_FOUND, "Subscription plan not found");
-  }
-  if(!user) throw new AppError(httpStatus.NOT_FOUND, "user not found")
-
-let  {email, firstName, lastName, userFullName,  stripeCustomerId} = user;
-
-  const fullName = firstName && lastName ? firstName + " " + lastName : userFullName;
- 
-  const activeSubscription = await prisma.userSubscription.findFirst({
-    where: { userId, status: SubscriptionStatus.ACTIVE },
-    include: { subscription: true },
   });
+  if (!subscriptionPlan) throw new AppError(httpStatus.NOT_FOUND, 'Subscription plan not found');
 
- 
-  if (!stripeCustomerId) {
-    const customer = await stripe.customers.create({ email: email , name: fullName as string });
+  // 4️⃣ Stripe Customer Creation (if needed)
+  let stripeCustomerId = user.stripeCustomerId;
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.userFullName;
+
+  if (!stripeCustomerId && subscriptionPlan.price > 0) {
+    const customer = await stripe.customers.create({ email: user.email, name: fullName||undefined });
     stripeCustomerId = customer.id;
+    await prisma.user.update({ where: { id: userId }, data: { stripeCustomerId } });
   }
 
- 
-  await stripe.paymentMethods.attach(payload.paymentMethodId, {
-    customer: stripeCustomerId,
-  });
-  await stripe.customers.update(stripeCustomerId, {
-    invoice_settings: { default_payment_method: payload.paymentMethodId },
-  });
+  const isFreePlan = subscriptionPlan.price === 0;
 
-  const isFreePlan = subscriptionPlan.title === SubscriptionType.FREE;
-
+  // 5️⃣ Free Plan Handling
   if (isFreePlan) {
-  
-    const existingFree = await prisma.userSubscription.findFirst({
-      where: { userId, subscriptionId: subscriptionPlan.id },
-    });
-
-    if (existingFree) {
-      return await prisma.userSubscription.update({
-        where: { id: existingFree.id },
-        data: { status: SubscriptionStatus.ACTIVE },
-      });
-    }
-
-    return await prisma.userSubscription.create({
-      data: { userId, subscriptionId: subscriptionPlan.id, status: SubscriptionStatus.ACTIVE },
+    return prisma.userSubscription.upsert({
+      where: { userId_subscriptionId: { userId, subscriptionId: subscriptionPlan.id } },
+      create: { userId, subscriptionId: subscriptionPlan.id, status: 'ACTIVE' },
+      update: { status: 'ACTIVE' },
     });
   }
 
-  if (!subscriptionPlan.pricingId) {
+  // 6️⃣ Paid Plan Handling
+  if (!payload.paymentMethodId)
+    throw new AppError(httpStatus.BAD_REQUEST, 'Payment method is required for paid plans');
+
+  if (!subscriptionPlan.pricingId)
+    throw new AppError(httpStatus.BAD_REQUEST, 'Missing Stripe priceId for this plan');
+
+  // ✅ Check Stripe price type
+  const stripePrice = await stripe.prices.retrieve(subscriptionPlan.pricingId);
+  if (stripePrice.type !== 'recurring') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Paid plan is missing Stripe priceId"
+      'Stripe price type must be recurring for subscription.'
     );
   }
 
-
-  const existingStripeSubs = await stripe.subscriptions.list({
-    customer: stripeCustomerId,
-    status: "active",
+  // Attach payment method to customer
+  await stripe.paymentMethods.attach(payload.paymentMethodId, { customer: stripeCustomerId! });
+  await stripe.customers.update(stripeCustomerId!, {
+    invoice_settings: { default_payment_method: payload.paymentMethodId },
   });
-  const existingStripe = existingStripeSubs.data[0];
 
-  let stripeSub: Stripe.Subscription;
+  // Create Stripe subscription
+  const stripeSub = await stripe.subscriptions.create({
+    customer: stripeCustomerId!,
+    items: [{ price: subscriptionPlan.pricingId }],
+    metadata: { subscriptionId: subscriptionPlan.id, userId },
+    payment_settings: { payment_method_types: ['card'], save_default_payment_method: 'on_subscription' },
+    expand: ['latest_invoice'],
+  });
 
-  if (existingStripe) {
- 
-    stripeSub = await stripe.subscriptions.update(existingStripe.id, {
-      items: [{ id: existingStripe.items.data[0].id, price: subscriptionPlan.pricingId }],
-      metadata: { priceId: subscriptionPlan.pricingId, subscriptionId: subscriptionPlan.id, userId },
-      proration_behavior: "create_prorations",
-    });
-
-   
-    await prisma.userSubscription.update({
-      where: { subscriptionPayId: existingStripe.id },
-      data: {
-        priceId: subscriptionPlan.pricingId,
-        subscriptionId: subscriptionPlan.id,
-        status: SubscriptionStatus.ACTIVE,
-      },
-    });
-
-  } else {
-   
-    stripeSub = await stripe.subscriptions.create({
-      customer: stripeCustomerId,
-      items: [{ price: subscriptionPlan.pricingId }],
-      metadata: { priceId: subscriptionPlan.pricingId, subscriptionId: subscriptionPlan.id, userId },
-      payment_settings: {
-        payment_method_types: ["card"],
-        save_default_payment_method: "on_subscription",
-      },
-      expand: ["latest_invoice"],
-    });
-
-   
-    await prisma.userSubscription.create({
-      data: {
-        userId,
-        subscriptionId: subscriptionPlan.id,
-        priceId: subscriptionPlan.pricingId,
-        subscriptionPayId: stripeSub.id,
-        status: SubscriptionStatus.ACTIVE,
-      },
-    });
-  }
+  // Save subscription in DB
+  return prisma.userSubscription.create({
+    data: {
+      userId,
+      subscriptionId: subscriptionPlan.id,
+      priceId: subscriptionPlan.pricingId,
+      subscriptionPayId: stripeSub.id,
+      status: 'ACTIVE',
+    },
+  });
 };
 
+
+
+ const unsubscribeSubscription = async (userId: string, subscriptionId: string) => {
+  // 1️⃣ Check user subscription
+  const userSubscription = await prisma.userSubscription.findFirst({
+    where: { userId, subscriptionId },
+  });
+
+  if (!userSubscription) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User subscription not found');
+  }
+
+  // 2️⃣ Check subscription plan
+  const subscriptionPlan = await prisma.subscription.findUnique({
+    where: { id: subscriptionId },
+  });
+
+  if (!subscriptionPlan) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Subscription plan not found');
+  }
+
+  // 3️⃣ Free Plan → শুধু DB থেকে delete
+  if (subscriptionPlan.price === 0) {
+    await prisma.userSubscription.delete({
+      where: { userId_subscriptionId: { userId, subscriptionId } },
+    });
+    return { success: true, message: 'Free subscription removed successfully.' };
+  }
+
+  // 4️⃣ Paid Plan → Stripe cancel + DB delete
+  if (!userSubscription.subscriptionPayId) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'No Stripe subscription ID found for this user.');
+  }
+
+  // Cancel subscription on Stripe
+  await stripe.subscriptions.cancel(userSubscription.subscriptionPayId);
+
+  // Delete from DB
+  await prisma.userSubscription.delete({
+    where: { userId_subscriptionId: { userId, subscriptionId } },
+  });
+
+  return { success: true, message: 'Paid subscription cancelled successfully.' };
+};
 
 const updateCustomerSubscription = async (payload: any) => {
   const currentSub = await prisma.userSubscription.findFirst({
@@ -424,6 +577,12 @@ const handleSubscriptionCreated = async (payload: any) => {
   });
 };
 
+const mySubscription = async (userId: any) => {
+ 
+  return await prisma.userSubscription.findFirst({where:{userId},select:{subscription:true}})
+};
+
+
 
 export const subscriptionService = {
   createSubscriptionIntoDb,
@@ -433,4 +592,6 @@ export const subscriptionService = {
   updateCustomerSubscription,
   handleSubscriptionSucceed,
   failedCustomerSubscription,
+  unsubscribeSubscription,
+  mySubscription
 };

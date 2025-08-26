@@ -46,4 +46,14 @@ router.get(
   auth(),
   subscriptionController.getAllSubscriptionPlans
 );
+router.get(
+  "/me",
+  auth(),
+  subscriptionController.mySubscription
+);
+router.post(
+  "/un-subscription",
+  auth(),
+  subscriptionController.unsubscribeSubscription
+);
 export const subscriptionRouter = router;

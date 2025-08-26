@@ -452,12 +452,14 @@ enum ResourceType {
 
 // ---------------------
 
+// enums
 enum SubscriptionType {
+  BRONZE
   GOLD
-  FREE
-  PLATINUM
   SILVER
-  LIFETIME
+  PLATINUM
+  BASIC
+  PREMIUM
 }
 
 

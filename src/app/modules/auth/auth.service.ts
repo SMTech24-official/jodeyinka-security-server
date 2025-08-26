@@ -31,7 +31,7 @@ const loginUserFromDB = async (payload: {
     throw new AppError(httpStatus.BAD_REQUEST, 'Password incorrect');
   }
   if (!userData.isEmailVerified) {
-    await UserServices.resendUserVerificationEmail(payload.email);
+    await mobileResendUserVerificationEmail(payload.email);
     throw new AppError(
       httpStatus.FORBIDDEN,
       'Your email is not verified, please check your email for the verification link.',
@@ -66,14 +66,17 @@ const loginUserFromDB = async (payload: {
 };
 
 
-const mobileLogin = async (payload: { email: string; password: string }) => {
+const mobileLogin = async (payload: any) => {
   const { email, password } = payload;
 
   try {
-    const userData = await prisma.user.findFirstOrThrow({
+    // 1️⃣ User খুঁজে বের করা
+    const userData:any = await prisma.user.findFirstOrThrow({
       where: { email },
+      include: { Transaction: true ,UserSubscription:true}, // Subscription check করার জন্য
     });
 
+    // 2️⃣ Password validate করা
     if (!userData.password) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Password not found');
     }
@@ -83,47 +86,57 @@ const mobileLogin = async (payload: { email: string; password: string }) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid password.');
     }
 
+    // 3️⃣ Email verification check
     if (!userData.isEmailVerified) {
-      // isEmailVerified false hole OTP pathano hobe
-      await mobileResendUserVerificationEmail(email); 
+      await mobileResendUserVerificationEmail(email);
       throw new AppError(
         httpStatus.FORBIDDEN,
-        'Your email is not verified, please check your email for the verification link.',
+        'Your email is not verified, please check your email for the verification link.'
       );
     }
-    
-    // twoFactor true hole OTP pathano hobe, normal login hobe na
+
+    // 4️⃣ Two-factor authentication (commented, enable if needed)
+    /*
     if (userData.twoFactor) {
       await mobileResendUserVerificationEmail(email);
       return {
         success: true,
         message: 'OTP sent for two-factor authentication. Please verify your email.',
-        requiresOTPVerification: true
+        requiresOTPVerification: true,
       };
     }
+    */
 
-    // Two-factor na thakle, direct access token generate hobe
-    const accessToken = "apnar-token-generation-logic"; // apnar generateToken function
-    
-    return {
-      success: true,
-      message: 'Logged in successfully.',
-      data: {
+    // 5️⃣ Access token generate করা
+    const accessToken = await generateToken(
+      {
         id: userData.id,
         name: userData.firstName,
         email: userData.email,
         role: userData.role,
         sponsorStatus: userData.sponsorStatus,
-        accessToken,
-      }
+      },
+      config.jwt.access_secret as Secret,
+      config.jwt.access_expires_in as string
+    );
+
+    // 6️⃣ Response return করা
+    return {
+      id: userData.id,
+      name: userData.firstName,
+      email: userData.email,
+      role: userData.role,
+      accessToken,
+      isSubscription: userData.UserSubscription?.length > 0 || false,
+      message: 'Logged in successfully.',
     };
   } catch (error) {
-    if (error instanceof AppError) {
-      throw error;
-    }
+    if (error instanceof AppError) throw error;
     throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, 'Login failed. Please try again.');
   }
 };
+
+
 const forgotPassword = async (email: string) => {
   const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);

@@ -156,10 +156,38 @@ const getAllSubscriptionPlans = catchAsync(
     });
   }
 );
+const unsubscribeSubscription = catchAsync(
+  async (req: Request, res: Response) => {
+     const userId = req.user?.id; 
+
+    const subscriptionPlan = await subscriptionService.unsubscribeSubscription(userId,req.body.subscriptionId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Un-Subscription plan   successfully",
+      data: subscriptionPlan,
+    });
+  }
+);
+const mySubscription = catchAsync(
+  async (req: Request, res: Response) => {
+     const userId = req.user?.id; 
+
+    const subscriptionPlan = await subscriptionService.mySubscription(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "My Subscription plan   successfully",
+      data: subscriptionPlan,
+    });
+  }
+);
 
 
 export const subscriptionController = {
   createSubscriptionPlan,
   purchaseSubscription,
-  getAllSubscriptionPlans
+  getAllSubscriptionPlans,
+  unsubscribeSubscription,
+  mySubscription
 };
