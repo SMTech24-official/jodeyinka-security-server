@@ -495,7 +495,7 @@ model UserSubscription {
   subscriptionId    String             @db.ObjectId
   subscription      Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   priceId           String?
-  subscriptionPayId String?            @unique
+  subscriptionPayId String?            
   status            SubscriptionStatus @default(PENDING)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt

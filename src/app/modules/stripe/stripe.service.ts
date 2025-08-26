@@ -549,33 +549,82 @@ const updateCustomerSubscription = async (payload: any) => {
   }
 };
 
+// const handleSubscriptionSucceed = async (payload: any) => {
+//   await prisma.userSubscription.update({
+//     where: { subscriptionPayId: payload?.subscription },
+//     data: { status: SubscriptionStatus.ACTIVE, priceId: payload.lines.data[0].price.id },
+//   });
+// };
+
 const handleSubscriptionSucceed = async (payload: any) => {
-  await prisma.userSubscription.update({
-    where: { subscriptionPayId: payload.subscription },
-    data: { status: SubscriptionStatus.ACTIVE, priceId: payload.lines.data[0].price.id },
+  await prisma.userSubscription.updateMany({
+    where: { subscriptionPayId: payload?.subscription },
+    data: { 
+      status: SubscriptionStatus.ACTIVE, 
+      priceId: payload.lines.data[0].price.id 
+    },
   });
 };
 
+
+// const failedCustomerSubscription = async (payload: any) => {
+//   await prisma.userSubscription.update({
+//     where: { subscriptionPayId: payload?.subscription },
+//     data: { status: SubscriptionStatus.DEACTIVE },
+//   });
+// };
+
 const failedCustomerSubscription = async (payload: any) => {
-  await prisma.userSubscription.update({
-    where: { subscriptionPayId: payload.subscription },
+  await prisma.userSubscription.updateMany({
+    where: { subscriptionPayId: payload?.subscription },
     data: { status: SubscriptionStatus.DEACTIVE },
   });
 };
 
+
+
+// const handleSubscriptionCreated = async (payload: any) => {
+//   await prisma.userSubscription.upsert({
+//     where: { subscriptionPayId: payload.id },
+//     update: { status: SubscriptionStatus.ACTIVE, priceId: payload.items.data[0].price.id },
+//     create: {
+//       userId: payload.metadata.userId,
+//       subscriptionId: payload.metadata.subscriptionId,
+//       subscriptionPayId: payload.id,
+//       priceId: payload.items.data[0].price.id,
+//       status: SubscriptionStatus.ACTIVE,
+//     },
+//   });
+// };
+
 const handleSubscriptionCreated = async (payload: any) => {
-  await prisma.userSubscription.upsert({
+  const existing = await prisma.userSubscription.findFirst({
     where: { subscriptionPayId: payload.id },
-    update: { status: SubscriptionStatus.ACTIVE, priceId: payload.items.data[0].price.id },
-    create: {
-      userId: payload.metadata.userId,
-      subscriptionId: payload.metadata.subscriptionId,
-      subscriptionPayId: payload.id,
-      priceId: payload.items.data[0].price.id,
-      status: SubscriptionStatus.ACTIVE,
-    },
   });
+
+  if (existing) {
+    // update case
+    await prisma.userSubscription.update({
+      where: { id: existing.id }, // id সবসময় unique থাকে
+      data: {
+        status: SubscriptionStatus.ACTIVE,
+        priceId: payload.items.data[0].price.id,
+      },
+    });
+  } else {
+    // create case
+    await prisma.userSubscription.create({
+      data: {
+        userId: payload.metadata.userId,
+        subscriptionId: payload.metadata.subscriptionId,
+        subscriptionPayId: payload.id,
+        priceId: payload.items.data[0].price.id,
+        status: SubscriptionStatus.ACTIVE,
+      },
+    });
+  }
 };
+
 
 const mySubscription = async (userId: any) => {
  
