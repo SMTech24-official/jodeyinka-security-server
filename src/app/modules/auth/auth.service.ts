@@ -406,15 +406,65 @@ const refreshToken = async (userId: string) => {
 
 
 
+// const googleLoginUserFromDB = async (payload: {
+//   email: string;
+//   userFullName: string;
+// }) => {
+//   // user টাইপ ঠিকভাবে দাও (যদি না পারো তাহলে any রাখা যাবে, তবে preferred নয়)
+//   let user: any = await prisma.user.findFirst({
+//     where: {
+//       email: payload.email,
+//     },
+//   });
+
+//   // যদি user না থাকে, তাহলে create করো
+//   if (!user) {
+//     user = await prisma.user.create({
+//       data: {
+//         email: payload.email,
+//         userFullName: payload.userFullName,
+//         isEmailVerified: true,
+//         sponsorStatus:"PENDING"
+//       },
+//     });
+//   }
+
+ 
+//   // Token generate করো
+//   const accessToken = await generateToken(
+//     {
+//       id: user.id,
+//       name: user.userFullName,
+//       email: user.email,
+//       role: user.role,
+//       sponsorStatus: user.sponsorStatus,
+//     },
+//     config.jwt.access_secret as Secret,
+//     config.jwt.access_expires_in as string
+//   );
+
+//   // Return final response
+//   return {
+//     id: user.id,
+//     name: user.userFullName,
+//     email: user.email,
+//     role: user.role,
+//     accessToken: accessToken,
+//     message: 'Logged in successfully.',
+//   };
+// };
+
+
+
+
 const googleLoginUserFromDB = async (payload: {
   email: string;
   userFullName: string;
 }) => {
-  // user টাইপ ঠিকভাবে দাও (যদি না পারো তাহলে any রাখা যাবে, তবে preferred নয়)
+  // user টাইপ ঠিকভাবে দাও (যদি না পারো তাহলে any রাখা যাবে)
   let user: any = await prisma.user.findFirst({
-    where: {
-      email: payload.email,
-    },
+    where: { email: payload.email },
+    include: { UserSubscription: true }, // ✅ subscription check করার জন্য
   });
 
   // যদি user না থাকে, তাহলে create করো
@@ -424,12 +474,12 @@ const googleLoginUserFromDB = async (payload: {
         email: payload.email,
         userFullName: payload.userFullName,
         isEmailVerified: true,
-        sponsorStatus:"PENDING"
+        sponsorStatus: "PENDING",
       },
+      include: { UserSubscription: true }, // ✅ create করার সময়ও include করা
     });
   }
 
- 
   // Token generate করো
   const accessToken = await generateToken(
     {
@@ -450,6 +500,7 @@ const googleLoginUserFromDB = async (payload: {
     email: user.email,
     role: user.role,
     accessToken: accessToken,
+    isSubscription: user.UserSubscription?.length > 0 || false, // ✅ এখানে add করা হলো
     message: 'Logged in successfully.',
   };
 };
