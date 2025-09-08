@@ -68,7 +68,9 @@ const mobileRegisterUserIntoDB = async (payload: User|any) => {
 
 export const mobileResendUserVerificationEmail = async (email: string) => {
   
-  const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit OTP toiri kora hochche
+//   const otp = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digit OTP toiri kora hochche
+const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
+
 
   const user = await prisma.user.update({
     where: { email: email },
