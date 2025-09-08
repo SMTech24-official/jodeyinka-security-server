@@ -55,6 +55,9 @@ const getAllEvents = async (searchParams: string|any, paginationOptions: IPagina
         mode: "insensitive",    // case-insensitive search (optional)
       },
     },
+     orderBy: {
+      createdAt: 'desc',
+    },
     select: {host: true, id: true, title: true, date: true, imageUrl: true,description: true}, 
     skip,
     take: limit,
