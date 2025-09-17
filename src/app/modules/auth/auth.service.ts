@@ -96,7 +96,7 @@ const mobileLogin = async (payload: any) => {
     }
 
     // 4️⃣ Two-factor authentication (commented, enable if needed)
-    /*
+    
     if (userData.twoFactor) {
       await mobileResendUserVerificationEmail(email);
       return {
@@ -105,7 +105,7 @@ const mobileLogin = async (payload: any) => {
         requiresOTPVerification: true,
       };
     }
-    */
+    
 
     // 5️⃣ Access token generate করা
     const accessToken = await generateToken(
