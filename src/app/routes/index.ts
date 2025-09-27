@@ -18,6 +18,7 @@ import { JobRoutes } from '../modules/job/job.route';
 import { LikeRoutes } from '../modules/like/like.route';
 import { MessagingSystemRoutes } from '../modules/messagingSystem/messaging.route';
 import { subscriptionRouter } from '../modules/stripe/stripe.route';
+import { postRouters } from '../modules/post/post.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -97,9 +98,15 @@ const moduleRoutes = [
   },
   
   {
+    path: '/post',
+    route: postRouters,
+  },
+  
+  {
     path: '/messagingSystems',
     route: MessagingSystemRoutes,
   },
+
   
   
 ];

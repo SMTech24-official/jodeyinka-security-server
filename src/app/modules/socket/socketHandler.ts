@@ -213,7 +213,7 @@ import { generateRoomId } from '../../utils/generateRoomId';
 import { verifyToken } from '../../utils/verifyToken';
 import { MessagingSystemService } from '../messagingSystem/messagingSystem.service';
 
-const connectedUsers = new Map<string, string>(); 
+ export const connectedUsers = new Map<string, string>(); 
 
 export const handleSocketEvents = (io: Server, socket: Socket) => {
   let currentUserId: string | null = null; 

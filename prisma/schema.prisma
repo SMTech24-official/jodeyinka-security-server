@@ -73,7 +73,24 @@ model User {
   NotificationReceiver Notifications[] @relation("NotificationReceiver")
   Subscription_Plan Subscription_Plan[]
   UserSubscription UserSubscription[]
+    invitesSent     GroupInvite[] @relation("InvitesSent")
+  invitesReceived GroupInvite[] @relation("InvitesReceived")
+  PostComment PostComment[]
+  PostLike PostLike[]
+  Post Post[]
 }
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PostVisibility {
+  PUBLIC
+  PRIVATE
+}
+
 
 model Resource {
   id          String       @id @default(auto()) @map("_id") @db.ObjectId
@@ -85,10 +102,38 @@ model Resource {
   type        ResourceType
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  status     PostStatus    @default(PENDING)
+  visibility PostVisibility @default(PUBLIC)
+  views      Int           @default(0)
+
   Comments    Comment[]
+
+  
 
   @@map("resources")
   Like Like[]
+
+}
+
+
+model Post {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  authorId    String       @db.ObjectId
+  Author      User         @relation(fields: [authorId], references: [id])
+  fileUrl     String?
+  description String
+  type        ResourceType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  status     PostStatus    @default(PENDING)
+  visibility PostVisibility @default(PUBLIC)
+  views      Int           @default(0)
+
+
+  PostLike PostLike[]
+
+  PostComment PostComment[]
 }
 
 enum SalaryType {
@@ -118,6 +163,14 @@ model Job {
   @@map("job")
 }
 
+enum JobApplicationStatus {
+  APPLIED
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+
 model JobApply {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
 
@@ -129,6 +182,8 @@ model JobApply {
 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+   status JobApplicationStatus @default(APPLIED)
+  
 
   @@map("jobApply")
 }
@@ -142,8 +197,23 @@ model Comment {
   Author     User     @relation(fields: [authorId], references: [id])
   content    String
   createdAt  DateTime @default(now())
+  
 
   @@map("comments")
+}
+
+
+model PostComment {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId  String   @db.ObjectId
+  post     Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId   String   @db.ObjectId
+  Author     User     @relation(fields: [authorId], references: [id])
+  content    String
+  createdAt  DateTime @default(now())
+  
+
+  @@map("post_comments")
 }
 
 model Like {
@@ -158,6 +228,21 @@ model Like {
 
   @@unique([resourceId, userId]) // একজন user একবারই like করতে পারবে
   @@map("likes")
+}
+
+
+model PostLike {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId String   @db.ObjectId
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId     String   @db.ObjectId
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@unique([postId, userId]) // একজন user একবারই like করতে পারবে
+  @@map("post_likes")
 }
 
 
@@ -240,6 +325,10 @@ model Notifications {
   message     String?
   type        String?
   createdAt   DateTime @default(now())
+
+  entityId   String?   // কোন resource/job/group/message এর সাথে linkd
+  entityType String?   // "POST", "COMMENT", "LIKE", "JOB", "MESSAGE"
+  isRead     Boolean   @default(false)   // read/unread status
 
   @@map("notifications")
 }
@@ -326,6 +415,7 @@ model Call {
   endedAt      DateTime?
   status       CallStatus
   createdAt    DateTime  @default(now())
+   type MessageType @default(TEXT)   // TEXT, IMAGE, VIDEO
 
   @@map("calls")
 }
@@ -354,6 +444,7 @@ model Group {
 
   @@map("groups")
   GroupMessage GroupMessage[]
+  GroupInvite GroupInvite[]
 }
 
 
@@ -403,6 +494,29 @@ model Favourite {
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+
+
+model GroupInvite {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String       @db.ObjectId
+  group     Group        @relation(fields: [groupId], references: [id])
+
+  inviterId String       @db.ObjectId
+  inviter   User         @relation("InvitesSent", fields: [inviterId], references: [id])
+
+  inviteeId String       @db.ObjectId
+  invitee   User         @relation("InvitesReceived", fields: [inviteeId], references: [id])
+
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 
