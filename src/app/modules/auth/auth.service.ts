@@ -69,12 +69,25 @@ const loginUserFromDB = async (payload: {
 const mobileLogin = async (payload: any) => {
   const { email, password } = payload;
 
+
+
   try {
     // 1️⃣ User খুঁজে বের করা
     const userData:any = await prisma.user.findFirstOrThrow({
       where: { email },
       include: { Transaction: true ,UserSubscription:true}, // Subscription check করার জন্য
     });
+
+      if (payload.fcmToken) {
+    await prisma.user.update({
+      where: {
+        id: userData.id,
+      },
+      data: {
+        fcmToken: payload.fcmToken
+      },
+    });
+  }
 
     // 2️⃣ Password validate করা
     if (!userData.password) {
@@ -105,6 +118,8 @@ const mobileLogin = async (payload: any) => {
         requiresOTPVerification: true,
       };
     }
+
+
     
 
     // 5️⃣ Access token generate করা
@@ -460,6 +475,7 @@ const refreshToken = async (userId: string) => {
 const googleLoginUserFromDB = async (payload: {
   email: string;
   userFullName: string;
+  fcmToken?:string;
 }) => {
   // user টাইপ ঠিকভাবে দাও (যদি না পারো তাহলে any রাখা যাবে)
   let user: any = await prisma.user.findFirst({
@@ -467,6 +483,16 @@ const googleLoginUserFromDB = async (payload: {
     include: { UserSubscription: true }, // ✅ subscription check করার জন্য
   });
 
+      if (payload.fcmToken) {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        fcmToken: payload.fcmToken
+      },
+    });
+  }
   // যদি user না থাকে, তাহলে create করো
   if (!user) {
     user = await prisma.user.create({

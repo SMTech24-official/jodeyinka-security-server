@@ -16,10 +16,12 @@ router.get('/', postController.getAllPosts);
 // ---------------- Comment Routes ----------------
 router.post('/comment', auth(), postController.addComment);
 router.get('/comment/:postId', postController.getComments);
+router.get('/comment/history/me',auth(), postController.getUserHowManyComments);
 
 // ---------------- Like Routes ----------------
 router.post('/toggle-like/:id', auth(), postController.toggleLikePost);
 
 router.get('/likes/:postId', postController.getLikes);
+router.get('/likes/history/me',auth(), postController.getUserHowManyLikes);
 
 export const postRouters = router;

@@ -171,6 +171,34 @@ const getLikes = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getUserHowManyLikes = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.user;
+
+  const likes = await postService.getUserHowManyLikes(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Likes history retrieved successfully',
+    data: likes,
+  });
+});
+
+
+const getUserHowManyComments = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.user;
+
+  const likes = await postService.getUserHowManyComments(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comments history retrieved successfully',
+    data: likes,
+  });
+});
+
 // ---------------- Export ----------------
 
 export const postController = {
@@ -184,5 +212,7 @@ export const postController = {
   getComments,
 toggleLikePost,
   getLikes,
-  approvePost
+  approvePost,
+  getUserHowManyLikes,
+  getUserHowManyComments
 };

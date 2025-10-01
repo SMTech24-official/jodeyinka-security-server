@@ -212,6 +212,7 @@ import config from '../../../config';
 import { generateRoomId } from '../../utils/generateRoomId';
 import { verifyToken } from '../../utils/verifyToken';
 import { MessagingSystemService } from '../messagingSystem/messagingSystem.service';
+import { GroupService } from '../group/group.service';
 
  export const connectedUsers = new Map<string, string>(); 
 
@@ -435,6 +436,36 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
     } catch (error) {
       console.error(`[Socket.IO - mark-as-seen ERROR] Error marking messages as seen for ${senderId} to ${receiverId}:`, error);
       socket.emit('mark_seen_error', { message: 'Failed to mark messages as seen.' });
+    }
+  });
+
+
+
+
+    // Join group room
+  socket.on("join_group", async (groupId: string) => {
+    socket.join(groupId);
+    console.log(`[Socket] User ${currentUserId} joined group ${groupId}`);
+    socket.emit("joined_group", { groupId });
+  });
+
+  // Leave group room
+  socket.on("leave_group", async (groupId: string) => {
+    socket.leave(groupId);
+    console.log(`[Socket] User ${currentUserId} left group ${groupId}`);
+    socket.emit("left_group", { groupId });
+  });
+
+  // Send group message
+  socket.on("send_group_message", async ({ groupId, content }) => {
+    try {
+      const message = await GroupService.sendGroupMessage(groupId, currentUserId, content);
+
+      // Broadcast to group room
+      io.to(groupId).emit("new_group_message", message);
+    } catch (err) {
+      console.error(err);
+      socket.emit("group_message_error", { message: "Failed to send group message" });
     }
   });
 };

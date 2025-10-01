@@ -36,6 +36,7 @@ model User {
   forgotPasswordOTPExpires      DateTime?
   dob                           DateTime?
   number                        String?
+  fcmToken                      String?
   isEmailVerified               Boolean?         @default(false)
   sponsorStatus                 SponsorStatus?   @default(NONE)
   role                          UserRoleEnum?    @default(USER)
@@ -73,11 +74,14 @@ model User {
   NotificationReceiver Notifications[] @relation("NotificationReceiver")
   Subscription_Plan Subscription_Plan[]
   UserSubscription UserSubscription[]
-    invitesSent     GroupInvite[] @relation("InvitesSent")
-  invitesReceived GroupInvite[] @relation("InvitesReceived")
+
   PostComment PostComment[]
   PostLike PostLike[]
   Post Post[]
+  SentFriendRequest FriendRequest[] @relation("SentRequests")
+  ReceivedFriendRequest FriendRequest[] @relation("ReceivedRequests")
+  GroupInvite GroupInvite[] @relation("Inviter")
+  GroupInviter GroupInvite[] @relation("Invitee")
 }
 
 enum PostStatus {
@@ -440,22 +444,23 @@ model Group {
   creatorId   String         @db.ObjectId
   creator     User           @relation(fields: [creatorId], references: [id])
   createdAt   DateTime       @default(now())
+
   members     GroupMember[]
+  messages    GroupMessage[]
+  invites     GroupInvite[]
 
   @@map("groups")
-  GroupMessage GroupMessage[]
-  GroupInvite GroupInvite[]
 }
 
-
 model GroupMember {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  groupId   String   @db.ObjectId
-  group     Group    @relation(fields: [groupId], references: [id])
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  role      GroupMemberRole  @default(MEMBER)
-  joinedAt  DateTime @default(now())
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String         @db.ObjectId
+  group     Group          @relation(fields: [groupId], references: [id])
+  userId    String         @db.ObjectId
+  user      User           @relation(fields: [userId], references: [id])
+  role      GroupMemberRole @default(MEMBER)
+  status    MemberStatus    @default(PENDING)
+  joinedAt  DateTime        @default(now())
 
   @@unique([groupId, userId])
   @@map("group_members")
@@ -466,21 +471,66 @@ enum GroupMemberRole {
   MEMBER
 }
 
-
-
+enum MemberStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
 
 model GroupMessage {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  groupId   String    @db.ObjectId
-  group     Group     @relation(fields: [groupId], references: [id])
-  senderId  String    @db.ObjectId
-  sender    User      @relation(fields: [senderId], references: [id])
-  content   String?
-  messageType MessageType @default(TEXT)
-  createdAt DateTime  @default(now())
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  groupId    String      @db.ObjectId
+  group      Group       @relation(fields: [groupId], references: [id])
+  senderId   String      @db.ObjectId
+  sender     User        @relation(fields: [senderId], references: [id])
+  content    String?
+  messageType GroupMessageType @default(TEXT)
+  createdAt  DateTime    @default(now())
 
   @@map("group_messages")
 }
+
+enum GroupMessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  FILE
+}
+
+model GroupInvite {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String       @db.ObjectId
+  group     Group        @relation(fields: [groupId], references: [id])
+  inviterId String       @db.ObjectId
+  inviter   User         @relation("Inviter", fields: [inviterId], references: [id])
+  inviteeId String       @db.ObjectId
+  invitee   User         @relation("Invitee", fields: [inviteeId], references: [id])
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  @@map("group_invites")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+
+model FriendRequest {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String    @db.ObjectId
+  receiverId String    @db.ObjectId
+  status     String   @default("pending") // pending | accepted | rejected
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentRequests", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedRequests", fields: [receiverId], references: [id])
+}
+
+
+
 
 
 model Favourite {
@@ -498,26 +548,6 @@ model Favourite {
 
 
 
-model GroupInvite {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  groupId   String       @db.ObjectId
-  group     Group        @relation(fields: [groupId], references: [id])
-
-  inviterId String       @db.ObjectId
-  inviter   User         @relation("InvitesSent", fields: [inviterId], references: [id])
-
-  inviteeId String       @db.ObjectId
-  invitee   User         @relation("InvitesReceived", fields: [inviteeId], references: [id])
-
-  status    InviteStatus @default(PENDING)
-  createdAt DateTime     @default(now())
-}
-
-enum InviteStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
 
 
 

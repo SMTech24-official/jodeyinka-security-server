@@ -19,6 +19,8 @@ import { LikeRoutes } from '../modules/like/like.route';
 import { MessagingSystemRoutes } from '../modules/messagingSystem/messaging.route';
 import { subscriptionRouter } from '../modules/stripe/stripe.route';
 import { postRouters } from '../modules/post/post.route';
+import { networkRoutes } from '../modules/network/network.route';
+import { GroupRoutes } from '../modules/group/group.route';
 const router = express.Router();
 
 const moduleRoutes = [
@@ -100,6 +102,15 @@ const moduleRoutes = [
   {
     path: '/post',
     route: postRouters,
+  },
+  {
+    path: '/network',
+    route: networkRoutes,
+  },
+  
+  {
+    path: '/group',
+    route: GroupRoutes,
   },
   
   {
