@@ -1,6 +1,7 @@
 import prisma from '../../utils/prisma';
 import { IPaginationOptions } from '../../interface/pagination.type';
 import { paginationHelpers } from '../../helpers/paginationHelper';
+import { JobApplicationStatus } from '@prisma/client';
 
 const createJob = async (data: {
   title: string;
@@ -169,22 +170,51 @@ const applyToJob = async (userId: string, jobId: string) => {
 };
 
 
-const getAppliedJobsByUser = async (userId: string) => {
-  const applications = await prisma.jobApply.findMany({
-    where: {
-      applicantId: userId,
-    },
+
+const getAppliedJobsByUser = async (
+  userId: string,
+  status?: "APPLIED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED",
+  page: number = 1,
+  limit: number = 10
+) => {
+  // 1️⃣ প্রথমে userId অনুযায়ী সব applications নিয়ে আসা
+  const allApplications = await prisma.jobApply.findMany({
+    where: { applicantId: userId },
     include: {
       Job: {
-        include: {
-          Author: true,
-        },
+        include: { Author: true },
       },
     },
+    orderBy: { createdAt: "desc" },
   });
 
-  return applications;
+  // 2️⃣ যদি status থাকে, তখন JS filter করে নেওয়া
+  let filteredApplications = allApplications;
+  if (status) {
+    filteredApplications = allApplications.filter(
+      (app) => app.status === status
+    );
+  }
+
+  // 3️⃣ Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedApplications = filteredApplications.slice(start, end);
+
+  // 4️⃣ Total count
+  const total = filteredApplications.length;
+
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+    data: paginatedApplications,
+  };
 };
+
 
 export const JobService = {
   createJob,

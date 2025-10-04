@@ -4,6 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import { JobService } from './job.service';
 import pickValidFields from '../../utils/pickValidFields';
+import { JobApplicationStatus } from '@prisma/client';
 
 // Create Job
 const createJob = catchAsync(async (req: Request, res: Response) => {
@@ -71,20 +72,27 @@ const applyToJob = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Get All Jobs Applied by a User
+// Get All Jobs Applied by a User (with filter + pagination)
+
+
 const getAppliedJobs = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { status, page = "1", limit = "10" } = req.query;
 
-
-  const result = await JobService.getAppliedJobsByUser(req.params.userId);
+  const result = await JobService.getAppliedJobsByUser(
+    userId,
+    status as "APPLIED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED" | undefined,
+    parseInt(page as string, 10),
+    parseInt(limit as string, 10)
+  );
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.OK, // ✅ required by TResponse type
     success: true,
-    message: 'Applied jobs retrieved successfully.',
+    message: "Applied jobs fetched successfully",
     data: result,
   });
 });
-
 export const JobController = {
   createJob,
   getAllJobs,

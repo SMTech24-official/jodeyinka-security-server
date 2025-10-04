@@ -77,14 +77,14 @@ const getPostById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyPosts = catchAsync(async (req: Request, res: Response) => {
-  const { page, limit } = req.query;
-
-
+  const { page = "1", limit = "10", type, status } = req.query;
 
   const posts = await postService.getMyPosts(
     req.user.id as string,
-    Number(page) || 1,
-    Number(limit) || 10
+    parseInt(page as string, 10),
+    parseInt(limit as string, 10),
+    type as 'BLOG' | 'MEDIA' | undefined,
+    status as "APPLIED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED" | undefined
   );
 
   sendResponse(res, {
@@ -129,9 +129,13 @@ const addComment = catchAsync(async (req: Request, res: Response) => {
 
 const getComments = catchAsync(async (req: Request, res: Response) => {
   const { postId } = req.params;
-  const { limit } = req.query;
+  const { page = "1", limit = "20" } = req.query;
 
-  const comments = await postService.getComments(postId, Number(limit) || 20);
+  const comments = await postService.getComments(
+    postId,
+    parseInt(page as string, 10),
+    parseInt(limit as string, 10)
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
